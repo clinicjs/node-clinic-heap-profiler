@@ -6,10 +6,7 @@ const d3Fg = require('d3-fg')
 const HtmlContent = require('./html-content.js')
 
 const FgTooltipContainer = require('./flame-graph-tooltip-container')
-const {
-  getFrameLabeler,
-  getAreaLabeler
-} = require('./flame-graph-label.js')
+const { getFrameLabeler, getAreaLabeler } = require('./flame-graph-label.js')
 const getFrameRenderer = require('./flame-graph-frame.js')
 
 const searchHighlightColor = 'orange'
@@ -79,38 +76,31 @@ class FlameGraph extends HtmlContent {
       this.flameGraph.clear(searchHighlightColor)
     })
 
-    this.ui.on('search', (query) => {
+    this.ui.on('search', query => {
       this.flameGraph.search(query, searchHighlightColor)
     })
   }
 
   initializeElements () {
     super.initializeElements()
-    this.d3Chart = this.d3Element.append('chart')
+    this.d3Chart = this.d3Element
+      .append('chart')
       .classed('flamegraph-outer', true)
       .classed('scroll-container', true)
       .style('position', 'relative')
 
-    this.d3CanvasOverlay = this.d3Chart.append('canvas')
-      .classed('flame-overlay', true)
+    this.d3CanvasOverlay = this.d3Chart.append('canvas').classed('flame-overlay', true)
     this.resetOverlayContext()
 
     // creating the component to highlight the hovered node on the flame graph
-    this.d3Highlighter = this.d3Element.append('div')
-      .classed('node-highlighter', true)
-    this.d3HighlighterDownArrow = this.d3Highlighter.append('div')
-      .classed('down-arrow', true)
-    this.d3HighlighterVerticalLine = this.d3Highlighter.append('div')
-      .classed('vertical-line', true)
-    this.d3HighlighterBox = this.d3Element.append('div')
-      .classed('highlighter-box', true)
+    this.d3Highlighter = this.d3Element.append('div').classed('node-highlighter', true)
+    this.d3HighlighterDownArrow = this.d3Highlighter.append('div').classed('down-arrow', true)
+    this.d3HighlighterVerticalLine = this.d3Highlighter.append('div').classed('vertical-line', true)
+    this.d3HighlighterBox = this.d3Element.append('div').classed('highlighter-box', true)
 
-    this.d3SelectionMarker = this.d3Element.append('div')
-      .classed('selection-box', true)
+    this.d3SelectionMarker = this.d3Element.append('div').classed('selection-box', true)
 
-    this.d3ZoomMarker = this.d3Element.append('div')
-      .classed('zoom-underline', true)
-      .classed('hidden', true)
+    this.d3ZoomMarker = this.d3Element.append('div').classed('zoom-underline', true).classed('hidden', true)
 
     if (this.tooltip) {
       this.tooltip = new FgTooltipContainer({
@@ -160,7 +150,7 @@ class FlameGraph extends HtmlContent {
         stroke: '#363b4c'
       },
       // We already categorized nodes during analysis
-      categorizer: (node) => ({ type: node.type }),
+      categorizer: node => ({ type: node.type }),
       width: this.d3Element.node().clientWidth,
       height: undefined, // we need to improve the way the canvas height gets calculated in d3-fg
       renderTooltip: this.tooltip && null, // disabling the built-in tooltip if another tooltip is defined
@@ -175,7 +165,7 @@ class FlameGraph extends HtmlContent {
     this.sort()
 
     const wrapperNode = this.d3Chart.node()
-    this.flameGraph.on('dblClick', (nodeData) => {
+    this.flameGraph.on('dblClick', nodeData => {
       this.ui.zoomNode(nodeData)
     })
 
@@ -224,7 +214,7 @@ class FlameGraph extends HtmlContent {
       }
     })
 
-    this.flameGraph.on('hoverout', (node) => {
+    this.flameGraph.on('hoverout', node => {
       if (this.tooltip) {
         this.tooltip.hide()
       }
@@ -315,10 +305,17 @@ class FlameGraph extends HtmlContent {
     if (node) {
       const rect = this.getNodeRect(node)
 
-      this.applyRectToDiv(this.d3SelectionMarker, Object.assign({}, {
-        // Ensure marker is visible on tiny frames
-        width: rect.width < 2 ? 2 : rect.width
-      }, rect))
+      this.applyRectToDiv(
+        this.d3SelectionMarker,
+        Object.assign(
+          {},
+          {
+            // Ensure marker is visible on tiny frames
+            width: rect.width < 2 ? 2 : rect.width
+          },
+          rect
+        )
+      )
     }
   }
 
@@ -340,7 +337,9 @@ class FlameGraph extends HtmlContent {
     const scrollTop = this.d3Chart.node().scrollTop
 
     // If aboveRect flag is true, draws this div extending up from the top of the rectangle
-    const translate = aboveRect ? `translateX(${rect.x}px)` : `translate3d(${rect.x}px, ${rect.y - scrollTop - rect.height}px, 0)`
+    const translate = aboveRect
+      ? `translateX(${rect.x}px)`
+      : `translate3d(${rect.x}px, ${rect.y - scrollTop - rect.height}px, 0)`
     const height = aboveRect ? rect.y - scrollTop - rect.height : rect.height
 
     d3Div
@@ -398,7 +397,8 @@ class FlameGraph extends HtmlContent {
   }
 
   sort () {
-    const sorter = this.ui.dataTree.getFilteredStackSorter()
+    const sorter = this.ui.dataTree.getAllocationsSorter()
+
     if (this.flameGraph) {
       this.flameGraph.sort((a, b) => {
         return sorter(a.data, b.data)
@@ -447,10 +447,10 @@ class FlameGraph extends HtmlContent {
     // Must re-render tree before applying exclusions, else error if tree and exclusions change at same time
     if (redrawGraph) this.flameGraph.renderTree(this.renderedTree)
 
-    toHide.forEach((name) => {
+    toHide.forEach(name => {
       this.flameGraph.typeHide(name)
     })
-    toShow.forEach((name) => {
+    toShow.forEach(name => {
       this.flameGraph.typeShow(name)
     })
 

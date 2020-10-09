@@ -1,7 +1,7 @@
 'use strict'
 require('@nearform/clinic-common/spinner')
 const Ui = require('./ui.js')
-const askBehaviours = require('@nearform/clinic-common/behaviours/ask')
+
 const loadFonts = require('@nearform/clinic-common/behaviours/font-loader')
 
 // Create UI
@@ -27,16 +27,13 @@ const drawUi = () => {
   }
 }
 
-// Attach ask tray behaviours
-askBehaviours()
-
 // Orchestrate font loading
-setTimeout(() => (
+setTimeout(() =>
   loadFonts({
     onLoad: () => ui.emit('uiFontLoaded'),
     onTimeout: () => ui.emit('uiFontLoaded')
   })
-))
+)
 
 drawUi()
 

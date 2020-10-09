@@ -49,12 +49,7 @@ class FiltersContent extends HtmlContent {
     const data = this.ui.dataTree
 
     if (data) {
-      const {
-        codeAreas,
-        useMerged,
-        showOptimizationStatus,
-        exclude
-      } = data
+      const { codeAreas, exclude } = data
 
       // Code Areas
       this.sections.codeAreas = codeAreas.map(area => {
@@ -74,7 +69,7 @@ class FiltersContent extends HtmlContent {
             child.description = this.ui.getDescriptionFromKey(child.excludeKey)
             child.checked = (() => {
               if (child.children) {
-                return child.children.some((ch) => !exclude.has(ch.excludeKey))
+                return child.children.some(ch => !exclude.has(ch.excludeKey))
               }
               return !exclude.has(child.excludeKey)
             })()
@@ -88,7 +83,7 @@ class FiltersContent extends HtmlContent {
 
         const checked = (() => {
           if (area.children && area.children.length) {
-            return area.children.some((child) => !exclude.has(child.excludeKey))
+            return area.children.some(child => !exclude.has(child.excludeKey))
           }
           return !exclude.has(area.excludeKey)
         })()
@@ -100,7 +95,7 @@ class FiltersContent extends HtmlContent {
           }
 
           const first = exclude.has(children[0].excludeKey)
-          return children.some((child) => exclude.has(child.excludeKey) !== first)
+          return children.some(child => exclude.has(child.excludeKey) !== first)
         })()
 
         return Object.assign({}, area, {
@@ -115,58 +110,17 @@ class FiltersContent extends HtmlContent {
         })
       })
 
-      // Advanced
-      this.sections.advanced = [
-        {
-          id: 'option-init',
-          label: 'Init',
-          description: 'Show initialization operations hidden by default, like module loading',
-          checked: !exclude.has('is:init'),
-          onChange: (datum, event) => {
-            this.ui.setCodeAreaVisibility({ excludeKey: 'is:init' }, event.target.checked)
-            this.ui.draw()
-          }
-        },
-        {
-          id: 'option-usemergedtree',
-          label: 'Merge',
-          description: 'Join optimized and unoptimized versions of frames',
-          checked: useMerged,
-          onChange: (datum, event) => {
-            this.ui.setUseMergedTree(event.target.checked)
-            // Toggle "Show optimization status" disabled class if Merged enabled/disabled
-            const showOptStatusId = this.sections.advanced[this.sections.advanced.length - 1].id
-            const el = this.d3Advanced.select('#' + showOptStatusId)
-            el.classed('disabled', event.target.checked)
-          }
-        },
-        {
-          id: 'option-showoptimizationstatus',
-          label: 'Show optimization status',
-          description: 'Highlight frames that are optimized functions',
-          disabled: useMerged,
-          checked: showOptimizationStatus,
-          onChange: (datum, event) => {
-            this.ui.setShowOptimizationStatus(event.target.checked)
-          }
-        }
-
-      ]
-
       this.exclude = exclude
     }
   }
 
   initializeElements () {
     super.initializeElements()
-    this.d3ContentWrapper
-      .classed('filters-content', true)
-      .classed('scroll-container', true)
+    this.d3ContentWrapper.classed('filters-content', true).classed('scroll-container', true)
 
     // creating the main sections
     // Code Areas
-    this.d3CodeArea = this.d3ContentWrapper.append('div')
-      .classed('code-area section', true)
+    this.d3CodeArea = this.d3ContentWrapper.append('div').classed('code-area section', true)
 
     const visibilityAcc = accordion({
       label: 'Visibility by code area',
@@ -180,23 +134,8 @@ class FiltersContent extends HtmlContent {
     this.d3CodeArea.append(() => visibilityAcc)
     this.currentAccordion = visibilityAcc
 
-    // Advanced
-    this.d3Advanced = this.d3ContentWrapper.append('div')
-      .classed('advanced section', true)
-
-    const advancedAcc = accordion({
-      label: 'Advanced',
-      content: '<ul class="options"></ul>',
-      classNames: ['advanced-acc'],
-      onClick: () => {
-        this._exclusiveAccordion(advancedAcc)
-      }
-    })
-    this.d3Advanced.append(() => advancedAcc)
-
     // Preferences
-    this.d3Preferences = this.d3ContentWrapper.append('div')
-      .classed('preferences section', true)
+    this.d3Preferences = this.d3ContentWrapper.append('div').classed('preferences section', true)
 
     const preferencesAcc = accordion({
       label: 'Preferences',
@@ -215,7 +154,7 @@ class FiltersContent extends HtmlContent {
 
   _exclusiveAccordion (clickedAccordion) {
     // auto collapses the previously expanded accordion
-    (this.currentAccordion !== clickedAccordion) && this.currentAccordion.toggle(false)
+    this.currentAccordion !== clickedAccordion && this.currentAccordion.toggle(false)
     this.currentAccordion = clickedAccordion
   }
 
@@ -226,15 +165,14 @@ class FiltersContent extends HtmlContent {
     parent.classList.add('pulsing')
 
     // Need to give the browser the time to apply the class
-    setTimeout(
-      () => {
-        this.ui.setCodeAreaVisibility({
-          codeArea: datum,
-          visible: checked
-        })
-        this.ui.draw()
-        parent.classList.remove('pulsing')
-      }, 15)
+    setTimeout(() => {
+      this.ui.setCodeAreaVisibility({
+        codeArea: datum,
+        visible: checked
+      })
+      this.ui.draw()
+      parent.classList.remove('pulsing')
+    }, 15)
   }
 
   _createListItems (items) {
@@ -256,7 +194,7 @@ class FiltersContent extends HtmlContent {
             classNames: [`${item.excludeKey}-show-all-acc`, 'nc-accordion--secondary'],
             label: `Show more (${item.children.length})`,
             content: childrenUl,
-            onClick: (expanded) => {
+            onClick: expanded => {
               this.expandedSubAccordions[item.excludeKey] = expanded
             }
           })
@@ -270,20 +208,24 @@ class FiltersContent extends HtmlContent {
   }
 
   _createOptionElement (data) {
-    const div = helpers.toHtml(`<div id="${data.id ? data.id : ''}" class="${data.excludeKey ? data.excludeKey.split(':')[0] : ''}"></div>`)
+    const div = helpers.toHtml(
+      `<div id="${data.id ? data.id : ''}" class="${data.excludeKey ? data.excludeKey.split(':')[0] : ''}"></div>`
+    )
 
-    div.appendChild(checkbox({
-      checked: data.checked,
-      disabled: data.disabled,
-      indeterminate: data.indeterminate,
-      rightLabel: `
+    div.appendChild(
+      checkbox({
+        checked: data.checked,
+        disabled: data.disabled,
+        indeterminate: data.indeterminate,
+        rightLabel: `
         <span class="name">${data.label}</span>
         <description class="description">${data.description ? `- ${data.description}` : ''}</description>
       `,
-      onChange: (event) => {
-        data.onChange && data.onChange(data, event)
-      }
-    }))
+        onChange: event => {
+          data.onChange && data.onChange(data, event)
+        }
+      })
+    )
 
     return div
   }
@@ -299,16 +241,6 @@ class FiltersContent extends HtmlContent {
       let ul = this.d3CodeArea.select('ul').node()
       ul.innerHTML = ''
       ul.appendChild(this._createListItems(codeAreas))
-
-      // Advanced
-      ul = this.d3Advanced.select('ul').node()
-      ul.innerHTML = ''
-      ul.appendChild(this._createListItems(this.sections.advanced))
-
-      // "Show optimization status" disabled class by default
-      const showOptStatusId = this.sections.advanced[this.sections.advanced.length - 1].id
-      const el = this.d3Advanced.select('#' + showOptStatusId)
-      el.classed('disabled', true)
 
       // Preferences
       ul = this.d3Preferences.select('ul').node()

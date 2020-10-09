@@ -41,7 +41,7 @@ class SelectionControls extends HtmlContent {
 
     this.ui.on('highlightNode', node => {
       if (!node && !this.selectedNode) return
-      this.rankNumber = this.ui.dataTree.getSortPosition(node || this.selectedNode)
+      this.rankNumber = this.ui.dataTree.getSortPosition(node)
       this.draw()
     })
   }
@@ -61,13 +61,13 @@ class SelectionControls extends HtmlContent {
     this.d3FramesCount.html(`<span class="visible-from-bp-1">of ${noNodes ? 0 : this.framesCount}</span>`)
     this.d3SelectNumber.property('value', noNodes ? 0 : this.rankNumber + 1)
 
-    const isHottest = this.rankNumber === 0
-    this.d3SelectHotter.attr('disabled', noNodes || isHottest || null)
-    this.d3SelectHottest.attr('disabled', noNodes || isHottest || null)
+    const isBiggest = this.rankNumber === 0
+    this.d3SelectBigger.attr('disabled', noNodes || isBiggest || null)
+    this.d3SelectBiggest.attr('disabled', noNodes || isBiggest || null)
 
-    const isColdest = this.rankNumber === this.framesCount - 1
-    this.d3SelectCooler.attr('disabled', noNodes || isColdest || null)
-    this.d3SelectColdest.attr('disabled', noNodes || isColdest || null)
+    const isSmallest = this.rankNumber === this.framesCount - 1
+    this.d3SelectSmaller.attr('disabled', noNodes || isSmallest || null)
+    this.d3SelectSmallest.attr('disabled', noNodes || isSmallest || null)
   }
 
   initializeElements () {
@@ -75,64 +75,75 @@ class SelectionControls extends HtmlContent {
 
     // Initialize controls
 
-    this.d3SelectHottest = this.d3Element.append(() => button({
-      rightIcon: chevronLeftFirst,
-      classNames: ['hotness-selector'],
-      onClick: () => this.selectByRank(0)
-    }))
+    this.d3SelectBiggest = this.d3Element.append(() =>
+      button({
+        rightIcon: chevronLeftFirst,
+        classNames: ['hotness-selector'],
+        onClick: () => this.selectByRank(0)
+      })
+    )
     this.tooltip.attach({
-      msg: 'Select the hottest frame (meaning, most time at the top of the stack)',
-      d3TargetElement: this.d3SelectHottest,
+      msg: 'Select the biggest allocation',
+      d3TargetElement: this.d3SelectBiggest,
       offset: {
         y: 2
       }
     })
 
-    this.d3SelectHotter = this.d3Element.append(() => button({
-      rightIcon: chevronLeft,
-      classNames: ['hotness-selector'],
-      onClick: () => this.selectByRank(this.rankNumber - 1)
-    }))
+    this.d3SelectBigger = this.d3Element.append(() =>
+      button({
+        rightIcon: chevronLeft,
+        classNames: ['hotness-selector'],
+        onClick: () => this.selectByRank(this.rankNumber - 1)
+      })
+    )
     this.tooltip.attach({
-      msg: 'Select the frame before the selected frame when ranked from hottest to coldest',
-      d3TargetElement: this.d3SelectHotter,
+      msg: 'Select the allocation before the selected allocation when ranked from biggest to smallest',
+      d3TargetElement: this.d3SelectBigger,
       offset: {
         y: 2
       }
     })
 
-    const d3RankWrapper = this.d3Element.append('span')
-      .classed('rank-wrapper', true)
+    const d3RankWrapper = this.d3Element.append('span').classed('rank-wrapper', true)
     d3RankWrapper.append('label').text('#')
 
-    this.d3SelectNumber = d3RankWrapper.append('input')
+    this.d3SelectNumber = d3RankWrapper
+      .append('input')
       .classed('hotness-selector button', true)
       .property('value', this.rankNumber)
 
-    this.d3FramesCount = d3RankWrapper.append('label').html('<span class="visible-from-bp-2">hottest frame, </span> ').append('span')
+    this.d3FramesCount = d3RankWrapper
+      .append('label')
+      .html('<span class="visible-from-bp-2">biggest allocation, </span> ')
+      .append('span')
 
-    this.d3SelectCooler = this.d3Element.append(() => button({
-      rightIcon: chevronRight,
-      label: 'Next hottest',
-      classNames: ['hotness-selector', 'visible-from-bp-2'],
-      onClick: () => this.selectByRank(this.rankNumber + 1)
-    }))
+    this.d3SelectSmaller = this.d3Element.append(() =>
+      button({
+        rightIcon: chevronRight,
+        label: 'Next biggest',
+        classNames: ['hotness-selector', 'visible-from-bp-2'],
+        onClick: () => this.selectByRank(this.rankNumber + 1)
+      })
+    )
     this.tooltip.attach({
-      msg: 'Select the frame after the selected frame when ranked from hottest to coldest',
-      d3TargetElement: this.d3SelectCooler,
+      msg: 'Select the allocation after the selected allocation when ranked from biggest to smallest',
+      d3TargetElement: this.d3SelectSmaller,
       offset: {
         y: 2
       }
     })
 
-    this.d3SelectColdest = this.d3Element.append(() => button({
-      rightIcon: chevronRightLast,
-      classNames: ['hotness-selector'],
-      onClick: () => this.selectByRank('last')
-    }))
+    this.d3SelectSmallest = this.d3Element.append(() =>
+      button({
+        rightIcon: chevronRightLast,
+        classNames: ['hotness-selector'],
+        onClick: () => this.selectByRank('last')
+      })
+    )
     this.tooltip.attach({
-      msg: 'Select the coldest frame (meaning, least time at the top of the stack)',
-      d3TargetElement: this.d3SelectColdest,
+      msg: 'Select the smallest allocation',
+      d3TargetElement: this.d3SelectSmallest,
       offset: {
         y: 2
       }

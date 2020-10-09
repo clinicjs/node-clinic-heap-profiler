@@ -30,8 +30,8 @@
   align-items: center;
   justify-content: center;
   min-width: 70px;
-  padding: 2px 4px;
-  white-space: pre-wrap;
+  padding: 2px 8px;
+  white-space: nowrap;
   font-weight: bold;
   background-color: black;
   color: white;

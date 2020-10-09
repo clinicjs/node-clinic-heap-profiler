@@ -4,18 +4,18 @@ const { test } = require('tap')
 const http = require('http')
 const fs = require('fs')
 const rimraf = require('rimraf')
-const ClinicFlame = require('../index.js')
+const ClinicHeapProfilder = require('../index.js')
 // TODO: times out intermitently due to data size, optimize or stream in string
 // const { containsData } = require('./util/validate-output.js')
 
 test('cmd - collect - detect server port', function (t) {
-  const tool = new ClinicFlame({ detectPort: true })
+  const tool = new ClinicHeapProfilder({ detectPort: true })
 
-  function cleanup (err, dirname) {
+  function cleanup(err, dirname) {
     t.ifError(err)
 
     let count = 0
-    function callback (err) {
+    function callback(err) {
       t.ifError(err)
       if (++count === 2) {
         t.end()
@@ -27,7 +27,10 @@ test('cmd - collect - detect server port', function (t) {
   }
 
   tool.collect(
-    [process.execPath, '-e', `
+    [
+      process.execPath,
+      '-e',
+      `
       const http = require('http')
       http.createServer(onrequest).listen(0)
 
@@ -35,7 +38,8 @@ test('cmd - collect - detect server port', function (t) {
         this.close()
         res.end('from server')
       }
-    `],
+    `
+    ],
     function (err, dirname) {
       if (err) return cleanup(err, dirname)
 

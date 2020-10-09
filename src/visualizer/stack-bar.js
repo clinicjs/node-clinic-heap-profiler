@@ -12,7 +12,8 @@ class StackBar extends HtmlContent {
     this.tooltip = contentProperties.tooltip
     this.tooltipHtmlContent = contentProperties.tooltipHtmlContent
 
-    this.tooltipHtmlContent.getTooltipD3()
+    this.tooltipHtmlContent
+      .getTooltipD3()
       .on('mouseenter', () => {
         clearTimeout(this.highlightedNodeTimeoutHandler)
         // this.ui.highlightNode(this.ui.selectedNode)
@@ -39,7 +40,8 @@ class StackBar extends HtmlContent {
 
     const ui = this.ui
 
-    this.d3StacksWrapper = this.d3Element.append('div')
+    this.d3StacksWrapper = this.d3Element
+      .append('div')
       .classed('stacks-wrapper', true)
       .on('mousemove', () => {
         clearTimeout(this.highlightedNodeTimeoutHandler)
@@ -92,8 +94,7 @@ class StackBar extends HtmlContent {
         }
       })
 
-    this.d3Pointer = this.d3Element.append('div')
-      .classed('pointer', true)
+    this.d3Pointer = this.d3Element.append('div').classed('pointer', true)
   }
 
   pointToNode (node) {
@@ -134,8 +135,8 @@ class StackBar extends HtmlContent {
       const lastFrame = frames[frames.length - 1]
       // This may not be an aggregate `remaining` frame if all frames fit on the stack bar,
       // which can happen on small profiles or with aggressive filters.
-      isInRemaining = Array.isArray(lastFrame.remaining) &&
-        lastFrame.remaining.some((smallFrame) => smallFrame.id === node.id)
+      isInRemaining =
+        Array.isArray(lastFrame.remaining) && lastFrame.remaining.some(smallFrame => smallFrame.id === node.id)
     }
 
     return found || isInRemaining ? `${left * totalWidth + margin}px` : '-20px'
@@ -147,10 +148,9 @@ class StackBar extends HtmlContent {
     }
 
     const { dataTree } = this.ui
-    const rootNode = this.ui.zoomedNode || dataTree.activeTree()
 
     // flattening the children array and sorting the frames
-    dataTree.sortFramesByHottest(this.ui.zoomedNode)
+    dataTree.sortAllocations(this.ui.zoomedNode)
 
     const availableWidth = this.d3Element.node().getBoundingClientRect().width
     const onePxPercent = 1 / availableWidth
@@ -158,19 +158,19 @@ class StackBar extends HtmlContent {
     const frames = []
     let usedWidth = 0.0
 
-    for (let i = 0; i < dataTree.flatByHottest.length; i++) {
-      const d = dataTree.flatByHottest[i]
-      const stackTop = d.onStackTop.asViewed
-      const totalFraction = Math.max(onePxPercent, stackTop / rootNode.value)
+    for (let i = 0; i < dataTree.sortedAllocations.length; i++) {
+      const d = dataTree.sortedAllocations[i]
+      const value = d.selfValue
+      const totalFraction = Math.max(onePxPercent, value / dataTree.total)
 
       const width = totalFraction
       const margin = totalFraction > 0.02 ? 2 : 1
 
       frames.push({ d, width, margin })
 
-      usedWidth += width + (margin / availableWidth)
+      usedWidth += width + margin / availableWidth
       if (usedWidth >= 0.98) {
-        const remaining = dataTree.flatByHottest.slice(i + 1)
+        const remaining = dataTree.sortedAllocations.slice(i + 1)
         frames.push({ remaining, width: 1 - usedWidth, margin: 0 })
         break
       }
@@ -186,7 +186,7 @@ class StackBar extends HtmlContent {
 
     const { dataTree } = this.ui
 
-    if (dataTree.flatByHottest === null) {
+    if (dataTree.sortedAllocations === null) {
       return
     }
 
@@ -195,20 +195,21 @@ class StackBar extends HtmlContent {
     }
     this.frames = this.prepareFrames()
 
-    const update = this.d3StacksWrapper.selectAll('div')
-      .data(this.frames)
+    const update = this.d3StacksWrapper.selectAll('div').data(this.frames)
     update.exit().remove()
 
     const self = this
 
-    update.enter().append('div')
+    update
+      .enter()
+      .append('div')
       .classed('stack-frame', true)
       .merge(update)
       .each(function (data) {
         const { width, margin } = data
 
-        const isHighlighted = data.d && self.highlightedNode && (self.highlightedNode.id === data.d.id)
-        const isSelected = data.d && self.ui.selectedNode && (self.ui.selectedNode.id === data.d.id)
+        const isHighlighted = data.d && self.highlightedNode && self.highlightedNode.id === data.d.id
+        const isSelected = data.d && self.ui.selectedNode && self.ui.selectedNode.id === data.d.id
 
         d3.select(this)
           .classed('highlighted', isHighlighted)

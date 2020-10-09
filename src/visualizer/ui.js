@@ -48,68 +48,54 @@ class Ui extends events.EventEmitter {
     this.sections = new Map()
     this.createContent()
 
-    this.history.on('change', (data) => {
+    this.history.on('change', data => {
       this.updateFromHistory(data)
     })
   }
 
   pushHistory (opts = {}) {
-    this.history.push({
-      selectedNodeId: this.selectedNode && this.selectedNode.id,
-      zoomedNodeId: this.zoomedNode && this.zoomedNode.id,
-      useMerged: this.dataTree.useMerged,
-      showOptimizationStatus: this.dataTree.showOptimizationStatus,
-      exclude: this.dataTree.exclude,
-      search: this.searchQuery,
-      walkthroughIndex: this.helpButton.WtPlayer.currentStepIndex
-    }, opts)
+    this.history.push(
+      {
+        selectedNodeId: this.selectedNode && this.selectedNode.id,
+        zoomedNodeId: this.zoomedNode && this.zoomedNode.id,
+        exclude: this.dataTree.exclude,
+        search: this.searchQuery,
+        walkthroughIndex: this.helpButton.WtPlayer.currentStepIndex
+      },
+      opts
+    )
   }
 
   updateFromHistory (data) {
-    const {
-      exclude,
-      useMerged,
-      search,
-      selectedNodeId,
-      showOptimizationStatus,
-      zoomedNodeId,
-      walkthroughIndex
-    } = data
+    const { exclude, search, selectedNodeId, zoomedNodeId, walkthroughIndex } = data
 
-    this.setUseMergedTree(useMerged, {
-      pushState: false,
-      selectedNodeId,
-      cb: () => {
-        this.dataTree.showOptimizationStatus = showOptimizationStatus
+    let anyChanges = false
 
-        let anyChanges = false
-
-        // Diff exclusion setting so FlameGraph can update.
-        exclude.forEach((name) => {
-          if (this.dataTree.exclude.has(name)) return
-          this.changedExclusions.toHide.add(name)
-          anyChanges = true
-        })
-        this.dataTree.exclude.forEach((name) => {
-          if (exclude.has(name)) return
-          this.changedExclusions.toShow.add(name)
-          anyChanges = true
-        })
-        this.dataTree.exclude = exclude
-
-        if (anyChanges) this.updateExclusions({ pushState: false, selectedNodeId, zoomedNodeId })
-
-        // Redraw before zooming to make sure these nodes are visible in the flame graph.
-        this.draw()
-
-        this.zoomNode(this.dataTree.getNodeById(zoomedNodeId), { pushState: false })
-        this.selectNode(this.dataTree.getNodeById(selectedNodeId), { pushState: false })
-      }
+    // Diff exclusion setting so FlameGraph can update.
+    exclude.forEach(name => {
+      if (this.dataTree.exclude.has(name)) return
+      this.changedExclusions.toHide.add(name)
+      anyChanges = true
     })
+    this.dataTree.exclude.forEach(name => {
+      if (exclude.has(name)) return
+      this.changedExclusions.toShow.add(name)
+      anyChanges = true
+    })
+    this.dataTree.exclude = exclude
+
+    if (anyChanges) this.updateExclusions({ pushState: false, selectedNodeId, zoomedNodeId })
+
+    // Redraw before zooming to make sure these nodes are visible in the flame graph.
+    this.draw()
+
+    this.zoomNode(this.dataTree.getNodeById(zoomedNodeId), { pushState: false })
+    this.selectNode(this.dataTree.getNodeById(selectedNodeId), { pushState: false })
 
     if (search !== this.searchQuery) {
       this.search(search, { pushState: false })
     }
+
     if (walkthroughIndex !== undefined) {
       this.helpButton.WtPlayer.skipTo(walkthroughIndex)
     }
@@ -214,16 +200,21 @@ class Ui extends events.EventEmitter {
   }
 
   /**
-  * Sections and content
-  **/
+   * Sections and content
+   **/
 
   createContent () {
     this.mainElement = document.querySelector(this.wrapperSelector)
 
-    this.uiContainer = new htmlContentTypes.HtmlContent(null, {
-      element: this.mainElement,
-      id: 'one-col-layout'
-    }, this, this.wrapperSelector)
+    this.uiContainer = new htmlContentTypes.HtmlContent(
+      null,
+      {
+        element: this.mainElement,
+        id: 'one-col-layout'
+      },
+      this,
+      this.wrapperSelector
+    )
 
     // creating the tooltip instance that the Ui's components can share
     const tooltip = this.uiContainer.addContent('Tooltip', {
@@ -264,7 +255,7 @@ class Ui extends events.EventEmitter {
       const minWidth = 600
 
       if (window.innerWidth > minWidth) {
-        const size = Math.min(window.innerWidth, window.innerHeight * 16 / 9)
+        const size = Math.min(window.innerWidth, (window.innerHeight * 16) / 9)
         const baseFactor = (size - minWidth) / 250
         const bonus = this.presentationMode ? 1.5 : 1
         return Math.round(baseFactor * bonus)
@@ -339,7 +330,7 @@ class Ui extends events.EventEmitter {
 
         scrollAmount = rect.y - viewportHeight * 0.4
         // scrolling only if the frame is outside the viewport
-        if ((rect.y - rect.height) > scrollContainer.scrollTop && rect.y < scrollContainer.scrollTop + viewportHeight) return
+        if (rect.y - rect.height > scrollContainer.scrollTop && rect.y < scrollContainer.scrollTop + viewportHeight) { return }
       }
 
       if (scrollContainer.scrollTo) {
@@ -353,7 +344,7 @@ class Ui extends events.EventEmitter {
       }
     }, 200)
 
-    const setFontSize = (zoomFactor) => {
+    const setFontSize = zoomFactor => {
       // increasing the font-size as the screen gets wider...
       document.documentElement.style.fontSize = 0.625 + zoomFactor / 16 + 'em'
     }
@@ -429,14 +420,24 @@ class Ui extends events.EventEmitter {
   getDescriptionFromKey (key) {
     const keysToDescriptions = {
       app: '<span>Functions in the code of the application being profiled.</span>',
-      deps: '<span>External modules in the application\'s node_modules directory.</span>',
+      deps: "<span>External modules in the application's node_modules directory.</span>",
       core: '<span>JS functions in core Node.js APIs.</span>',
       wasm: '<span>Compiled WebAssembly code.</span>',
-      'all-v8': `<span>The JavaScript engine used by default in Node.js.</span> ${this.createMoreInfoLink('https://clinicjs.org/documentation/flame/09-advanced-controls/#controls-v8')}`,
-      'all-v8:v8': `<span>Operations in V8's implementation of JS.</span> ${this.createMoreInfoLink('https://clinicjs.org/documentation/flame/09-advanced-controls/#controls-v8-runtime')}`,
-      'all-v8:native': `<span>JS compiled into V8, such as prototype methods and eval.</span> ${this.createMoreInfoLink('https://clinicjs.org/documentation/flame/09-advanced-controls/#controls-v8-native')}`,
-      'all-v8:cpp': `<span>Native C++ operations called by V8, including shared libraries.</span> ${this.createMoreInfoLink('https://clinicjs.org/documentation/flame/09-advanced-controls/#controls-v8-cpp')}`,
-      'all-v8:regexp': `<span>The RegExp notation is shown as the function name.</span> ${this.createMoreInfoLink('https://clinicjs.org/documentation/flame/09-advanced-controls/#controls-regexp')}`
+      'all-v8': `<span>The JavaScript engine used by default in Node.js.</span> ${this.createMoreInfoLink(
+        'https://clinicjs.org/documentation/flame/09-advanced-controls/#controls-v8'
+      )}`,
+      'all-v8:v8': `<span>Operations in V8's implementation of JS.</span> ${this.createMoreInfoLink(
+        'https://clinicjs.org/documentation/flame/09-advanced-controls/#controls-v8-runtime'
+      )}`,
+      'all-v8:native': `<span>JS compiled into V8, such as prototype methods and eval.</span> ${this.createMoreInfoLink(
+        'https://clinicjs.org/documentation/flame/09-advanced-controls/#controls-v8-native'
+      )}`,
+      'all-v8:cpp': `<span>Native C++ operations called by V8, including shared libraries.</span> ${this.createMoreInfoLink(
+        'https://clinicjs.org/documentation/flame/09-advanced-controls/#controls-v8-cpp'
+      )}`,
+      'all-v8:regexp': `<span>The RegExp notation is shown as the function name.</span> ${this.createMoreInfoLink(
+        'https://clinicjs.org/documentation/flame/09-advanced-controls/#controls-regexp'
+      )}`
     }
 
     if (keysToDescriptions[key]) {
@@ -457,12 +458,14 @@ class Ui extends events.EventEmitter {
     let isChanged = false
 
     if (codeArea.children && codeArea.children.length) {
-      const childrenChanged = codeArea.children.forEach(child => this.setCodeAreaVisibility({
-        codeArea: child,
-        visible,
-        pushState: false,
-        isRecursing: true
-      }))
+      const childrenChanged = codeArea.children.forEach(child =>
+        this.setCodeAreaVisibility({
+          codeArea: child,
+          visible,
+          pushState: false,
+          isRecursing: true
+        })
+      )
       this.updateExclusions({ pushState })
       return childrenChanged
     } else {
@@ -484,7 +487,8 @@ class Ui extends events.EventEmitter {
   updateExclusions ({ initial, pushState = true, selectedNodeId, zoomedNodeId } = {}) {
     this.dataTree.update(initial)
 
-    const selectedNodeNotShown = this.selectedNode && (this.dataTree.isNodeExcluded(this.selectedNode) || this.selectedNode.category === 'none')
+    const selectedNodeNotShown =
+      this.selectedNode && (this.dataTree.isNodeExcluded(this.selectedNode) || this.selectedNode.category === 'none')
 
     if (!initial && !selectedNodeId && selectedNodeNotShown) {
       this.selectHottestNode()
@@ -501,40 +505,6 @@ class Ui extends events.EventEmitter {
     } else {
       cb()
     }
-  }
-
-  setUseMergedTree (useMerged, { pushState = true, selectedNodeId, cb } = {}) {
-    if (this.dataTree.useMerged === useMerged) {
-      if (cb) cb()
-      return
-    }
-
-    // Current selected and zoomed nodes will be in wrong tree, therefore may cause errors during draw.
-    // ui.selectNode() will be called properly in this.selectHottestNode() or based on selectedNodeId.
-    this.selectedNode = null
-
-    this.zoomNode(null, {
-      cb: () => {
-      // Complete update after any zoom animation is complete
-        this.dataTree.setActiveTree(useMerged)
-
-        this.draw()
-        if (!selectedNodeId) this.selectHottestNode()
-
-        if (pushState) this.pushHistory()
-
-        if (cb) cb()
-
-        this.emit('updateExclusions')
-      }
-    })
-  }
-
-  setShowOptimizationStatus (showOptimizationStatus) {
-    this.dataTree.showOptimizationStatus = showOptimizationStatus
-    this.draw()
-    this.pushHistory()
-    this.emit('updateExclusions')
   }
 
   setData (dataTree) {
@@ -599,30 +569,38 @@ class Ui extends events.EventEmitter {
     this.uiContainer.initializeElements()
 
     // auto hiding mobile search-box on blur if empty
-    this.mSearchBoxWrapper.d3Element.select('input')
-      .on('blur', (datum, index, nodes) => {
-        this.mSearchBoxAutoHideHnd = setTimeout(() => {
-          // this little delay is to avoid clashes between the 'blur' cb and clicking on the search button
-          if (nodes[index].value.trim() === '') {
-            this.toggleMobileSearchBox(false)
-          }
-        }, 300)
-      })
+    this.mSearchBoxWrapper.d3Element.select('input').on('blur', (datum, index, nodes) => {
+      this.mSearchBoxAutoHideHnd = setTimeout(() => {
+        // this little delay is to avoid clashes between the 'blur' cb and clicking on the search button
+        if (nodes[index].value.trim() === '') {
+          this.toggleMobileSearchBox(false)
+        }
+      }, 300)
+    })
 
     // adding the mSearchBox close button
-    this.mSearchBoxWrapper.d3Element.append(() => button({
-      leftIcon: close,
-      onClick: () => {
-        clearTimeout(this.mSearchBoxAutoHideHnd)
-        if (this.searchQuery === null) {
-          // close if empty
-          this.toggleMobileSearchBox(false)
-        } else {
-          // clear otherwise
-          this.clearSearch()
+    this.mSearchBoxWrapper.d3Element.append(() =>
+      button({
+        leftIcon: close,
+        onClick: () => {
+          clearTimeout(this.mSearchBoxAutoHideHnd)
+          if (this.searchQuery === null) {
+            // close if empty
+            this.toggleMobileSearchBox(false)
+          } else {
+            // clear otherwise
+            this.clearSearch()
+          }
         }
-      }
-    }))
+      })
+    )
+
+    // // Remove ask button - This should be removed once the functionality is gone from Clinic
+    const askButton = d3.select('.nc-ask-button').node()
+
+    if (askButton) {
+      askButton.remove()
+    }
 
     // walkthrough init
     this.helpButton = walkthroughButton({

@@ -45,7 +45,7 @@ class HtmlContent {
       throw new Error(`Duplicate ID ${contentProperties.id} on content ${this.id}`)
     }
 
-    const identifier = contentProperties.id || className + (counter++)
+    const identifier = contentProperties.id || className + counter++
 
     this.content.set(identifier, item)
     this.contentIds[prepend ? 'unshift' : 'push'](identifier)
@@ -88,15 +88,7 @@ class HtmlContent {
 
   // Initial creation of elements independent of data and layout, before .setData() is called
   initializeElements (skipContent = false) {
-    const {
-      htmlContent,
-      htmlElementType,
-      element,
-      id,
-      classNames,
-      title,
-      eventHandler
-    } = this.contentProperties
+    const { htmlContent, htmlElementType, element, id, classNames, title, eventHandler } = this.contentProperties
 
     const d3ParentElement = this.parentContent ? this.parentContent.d3ContentWrapper : d3.select(this.wrapperSelector)
 
@@ -106,13 +98,13 @@ class HtmlContent {
 
     if (this.collapseControl) {
       this.collapseControl.initializeElements()
-      this.d3ContentWrapper = this.d3Element.append('div')
-        .classed('collapsible-content-wrapper', true)
+      this.d3ContentWrapper = this.d3Element.append('div').classed('collapsible-content-wrapper', true)
 
       if (id) this.d3ContentWrapper.attr('id', `${id}-inner`)
 
       if (this.collapseControl.closeIcon) {
-        this.d3ContentWrapper.insert('span', ':first-child')
+        this.d3ContentWrapper
+          .insert('span', ':first-child')
           .html(this.collapseControl.closeIcon)
           .classed('close', true)
           .classed('portrait-only', this.collapseControl.portraitOnly)
@@ -175,7 +167,7 @@ class CollapseControl extends HtmlContent {
     if (this.portraitOnly) this.d3Element.classed('portrait-only', true)
 
     if (this.collapseEvent) {
-      this.ui.on(`collapse-${this.collapseEvent}`, (closeBool) => {
+      this.ui.on(`collapse-${this.collapseEvent}`, closeBool => {
         this.parentContent.collapseClose()
       })
     }

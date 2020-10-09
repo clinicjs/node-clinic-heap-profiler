@@ -9,13 +9,7 @@ function getAreaLabeler (bindTo) {
 }
 
 function renderFrameLabel (frameHeight, options) {
-  const {
-    context,
-    node,
-    x,
-    y,
-    width
-  } = options
+  const { context, node, x, y, width } = options
   const nodeData = node.data
 
   // Don't spend any time in frames with less than one padding width between left/right padding
@@ -101,16 +95,8 @@ function renderFrameLabel (frameHeight, options) {
 function renderAreaLabel (locals, rect, priorSiblingWidth, lineWidth, lineAlpha) {
   if (this.isAnimating) return
 
-  const {
-    context,
-    node
-  } = locals
-  const {
-    x,
-    y,
-    width,
-    height
-  } = rect
+  const { context, node } = locals
+  const { x, y, width, height } = rect
   const nodeData = node.data
 
   const areaX = Math.ceil(x - priorSiblingWidth) + lineWidth
@@ -122,10 +108,11 @@ function renderAreaLabel (locals, rect, priorSiblingWidth, lineWidth, lineAlpha)
 
   if (availableWidth < fontSize) return
 
-  const areaName = (
-    nodeData.category === 'core' ? 'node'
-      : nodeData.category === 'all-v8' ? this.ui.getLabelFromKey(this.ui.dataTree.getTypeKey(nodeData))
-        : nodeData.type
+  const areaName = (nodeData.category === 'core'
+    ? 'node'
+    : nodeData.category === 'all-v8'
+      ? this.ui.getLabelFromKey(this.ui.dataTree.getTypeKey(nodeData))
+      : nodeData.type
   ).toUpperCase()
   const nameWidth = context.measureText(areaName).width
   const visibleName = truncateFunctionName(context, availableWidth, areaName, nameWidth)
