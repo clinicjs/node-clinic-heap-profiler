@@ -39,12 +39,12 @@
     "on-net-listen": "1.1.2",
     "pump": "^3.0.0",
     "querystringify": "^2.1.0",
+    "sinusoidal-decimal": "^1.0.0",
     "tmp": "^0.2.1"
   },
   "devDependencies": {
     "chalk": "^4.1.0",
     "chokidar": "^3.4.2",
-    "fastify": "^3.5.1",
     "snazzy": "^8.0.0",
     "standard": "^14.3.1"
   }

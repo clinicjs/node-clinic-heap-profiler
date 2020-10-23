@@ -63,6 +63,16 @@ produced by the sampler using `heapProfiler.collect`.
 When completed the `callback` will be called with no extra arguments, except a
 possible error.
 
+## Examples
+
+See the `examples` folder. All example should be run from the repository main folder:
+
+```sh
+node examples/fastify-autocannon
+```
+
+Each `index.js` will contain any specific setup step required by the example, if any.
+
 ## License
 
 [MIT](LICENSE)
