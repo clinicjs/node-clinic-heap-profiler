@@ -17,6 +17,7 @@
 
 const autocannon = require('autocannon')
 const { spawnSync } = require('child_process')
+const open = require('open')
 const { join } = require('path')
 const ClinicHeapProfiler = require('../../')
 
@@ -32,8 +33,13 @@ heapProfiler.collect([join(__dirname, 'app.js')], function (err, filepath) {
       throw err
     }
 
-    spawnSync('open', [filepath + '.html'])
-    console.log('The memory flamechart graph has been opened in your browser.')
+    open(filepath + '.html')
+      .then(() => {
+        console.log('The memory flamechart graph has been opened in your browser.')
+      })
+      .catch(e => {
+        console.log('Cannot open the memory flamechart graph file.', e)
+      })
   })
 })
 

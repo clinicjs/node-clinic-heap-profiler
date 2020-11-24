@@ -100,7 +100,6 @@ class ClinicHeapProfiler extends events.EventEmitter {
     const { detectPort = false, debug = false, dest = null } = settings
 
     this.detectPort = detectPort
-    this.duration = duration
     this.debug = debug
     this.dest = dest
   }

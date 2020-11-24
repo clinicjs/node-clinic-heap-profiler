@@ -29,7 +29,7 @@
   "license": "MIT",
   "dependencies": {
     "@nearform/clinic-common": "^4.0.0",
-    "@nearform/heap-profiler": "^0.8.0",
+    "@nearform/heap-profiler": "^0.8.1",
     "abort-controller": "^3.0.0",
     "copy-to-clipboard": "^3.0.8",
     "d3-array": "^2.0.2",
@@ -48,6 +48,7 @@
     "chokidar": "^3.4.2",
     "fastify": "^3.7.0",
     "ioredis": "^4.17.3",
+    "open": "^7.3.0",
     "snazzy": "^8.0.0",
     "standard": "^14.3.1"
   }
