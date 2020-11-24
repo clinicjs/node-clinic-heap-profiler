@@ -1,6 +1,7 @@
+'use strict'
+
 const fs = require('fs')
 const path = require('path')
-const { promisify } = require('util')
 
 function isNodeCore(url) {
   const filePath = url.split(' ')[1]
