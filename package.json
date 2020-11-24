@@ -39,8 +39,7 @@
     "on-net-listen": "1.1.2",
     "pump": "^3.0.0",
     "querystringify": "^2.1.0",
-    "sinusoidal-decimal": "^1.0.0",
-    "tmp": "^0.2.1"
+    "sinusoidal-decimal": "^1.0.0"
   },
   "devDependencies": {
     "chalk": "^4.1.0",
