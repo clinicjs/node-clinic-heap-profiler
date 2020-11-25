@@ -113,7 +113,8 @@ class ClinicHeapProfiler extends events.EventEmitter {
 
     const env = {
       ...process.env,
-      HEAP_PROFILER_DESTINATION: this.dest
+      HEAP_PROFILER_DESTINATION: this.dest,
+      HEAP_PROFILER_PRELOADER_DISABLED: 'true'
     }
 
     if (this.detectPort) {
