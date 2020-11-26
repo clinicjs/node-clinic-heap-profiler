@@ -36,7 +36,6 @@ const heapProfiler = new ClinicHeapProfiler()
 ### new ClinicHeapProfiler([settings])
 
 - settings [`<Object>`][]
-  - duration [`<Number>`][] **Default**: 10000
   - detectPort [`<boolean>`][] **Default**: false
   - debug [`<boolean>`][] If set to true, the generated html will not be minified.
     **Default**: false
@@ -54,6 +53,8 @@ value in the callback.
 `stdout`, `stderr`, and `stdin` will be relayed to the calling process. As will
 the `SIGINT` event.
 
+In order to finish the sampling, the process must receive a `SIGINT` (the simplest way is to press Ctrl+C).
+
 #### `flame.visualize(dataFilename, outputFilename, callback)`
 
 Will consume the datafile specified by `dataFilename`, this datafile will be
@@ -68,7 +69,7 @@ possible error.
 See the `examples` folder. All example should be run from the repository main folder:
 
 ```sh
-node examples/fastify-autocannon
+node examples/redis-web-service
 ```
 
 Each `index.js` will contain any specific setup step required by the example, if any.

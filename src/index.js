@@ -22,17 +22,17 @@ function execute(args, dest, env, nodeOptions, cb, server) {
     env.NODE_OPTIONS = nodeOptions
     const app = spawn('node', args, { stdio: ['ignore', 'inherit', 'inherit'], env })
 
-    // TODO@PI: How do we trigger the start?
-    setTimeout(() => {
-      app.kill('SIGUSR2')
-    }, 100)
+    // Forward SIGINT to the spawned process so it stops heap profiling
+    process.once('SIGINT', () => {
+      app.kill('SIGINT')
+    })
 
     app.once('exit', code => {
       if (server) {
         server.close()
       }
 
-      if (code !== 0) {
+      if (code) {
         cb(new Error(`Child process exited with code ${code}.`))
         return
       }
@@ -81,7 +81,7 @@ function writeHtml(data, outputFilename, debug, cb) {
     styles: styleFile,
     script: scriptFile,
     headerLogoUrl: 'https://clinicjs.org/heap-profiler/',
-    headerLogoTitle: 'Clinic Flame on Clinicjs.org',
+    headerLogoTitle: 'Clinic Heap Profiler on Clinicjs.org',
     headerLogo: logoFile,
     headerText: 'Heap Profiler',
     toolVersion: version,
@@ -97,16 +97,15 @@ class ClinicHeapProfiler extends events.EventEmitter {
   constructor(settings = {}) {
     super()
 
-    const { detectPort = false, duration = 10000, debug = false, dest = null } = settings
+    const { detectPort = false, debug = false, dest = null } = settings
 
     this.detectPort = detectPort
-    this.duration = duration
     this.debug = debug
     this.dest = dest
   }
 
   collect(args, cb) {
-    let nodeOptions = `-r ${path.join(__dirname, '../node_modules/@nearform/heap-profiler')}`
+    let nodeOptions = ` -r ${path.join(__dirname, './injects/sampler.js')}`
 
     if (!this.dest) {
       this.dest = path.join(process.cwd(), `.clinic/${process.pid}-clinic.heapprofile`)
@@ -114,12 +113,8 @@ class ClinicHeapProfiler extends events.EventEmitter {
 
     const env = {
       ...process.env,
-      HEAP_PROFILER_LOGGING_DISABLED: true,
-      HEAP_PROFILER_SNAPSHOT: false,
-      HEAP_PROFILER_TIMELINE: false,
-      HEAP_PROFILER_PROFILE: true,
-      HEAP_PROFILER_PROFILE_DURATION: this.duration,
-      HEAP_PROFILER_PROFILE_DESTINATION: this.dest
+      HEAP_PROFILER_DESTINATION: this.dest,
+      HEAP_PROFILER_PRELOADER_DISABLED: 'true'
     }
 
     if (this.detectPort) {

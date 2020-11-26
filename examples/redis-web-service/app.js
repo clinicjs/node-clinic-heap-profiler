@@ -1,6 +1,5 @@
 'use strict'
 
-const autocannon = require('autocannon')
 const { spawnSync } = require('child_process')
 const fastify = require('fastify')
 const Redis = require('ioredis')
@@ -47,26 +46,8 @@ server.post('/', (request, reply) => {
 })
 
 // Start the server
-server.listen(0, (err, address) => {
+server.listen(3000, (err, address) => {
   if (err) {
     throw err
   }
-
-  server.log.info(`Server listening on ${address}.`)
-
-  // Start autocannon
-  server.log.info(`Starting autocannon ...`)
-  autocannon({
-    url: address,
-    connections: 10,
-    pipelining: 1,
-    duration: 10,
-    requests: Array.from(Array(1000), () => ({ method: Math.random() < 0.45 ? 'POST' : 'GET' }))
-  })
 })
-
-// After 15 seconds (@nearform/heap-profiler default is 10 seconds, so we let it finish) terminate the process
-setTimeout(() => {
-  server.log.info(`heap-profiler should have finished. Terminating the process ...`)
-  process.exit(0)
-}, 15000)
