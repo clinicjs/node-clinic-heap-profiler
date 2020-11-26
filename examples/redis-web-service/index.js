@@ -23,7 +23,7 @@ const ClinicHeapProfiler = require('../../')
 
 const heapProfiler = new ClinicHeapProfiler({ detectPort: true })
 
-heapProfiler.collect([join(__dirname, 'app.js')], function (err, filepath) {
+heapProfiler.collect(['node', join(__dirname, 'app.js')], function (err, filepath) {
   if (err) {
     throw err
   }

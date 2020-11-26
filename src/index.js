@@ -20,7 +20,7 @@ function execute(args, dest, env, nodeOptions, cb, server) {
     }
 
     env.NODE_OPTIONS = nodeOptions
-    const app = spawn('node', args, { stdio: ['ignore', 'inherit', 'inherit'], env })
+    const app = spawn(args[0], args.slice(1), { stdio: ['ignore', 'inherit', 'inherit'], env })
 
     // Forward SIGINT to the spawned process so it stops heap profiling
     process.once('SIGINT', () => {
