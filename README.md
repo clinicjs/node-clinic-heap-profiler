@@ -39,7 +39,7 @@ const heapProfiler = new ClinicHeapProfiler()
   - detectPort [`<boolean>`][] **Default**: false
   - debug [`<boolean>`][] If set to true, the generated html will not be minified.
     **Default**: false
-  - dest [`<String>`][] The file where the collected data is stored. By default it generates a `.heapprofile` in the `.clinic` folder.
+  - dest [`<String>`][] The file where the collected data is stored. By default it generates a `.clinic-heapprofile` file in the `.clinic` folder.
     **Default**: '.'
 
 #### `heapProfiler.collect(args, callback)`

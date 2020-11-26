@@ -108,7 +108,7 @@ class ClinicHeapProfiler extends events.EventEmitter {
     let nodeOptions = ` -r ${path.join(__dirname, './injects/sampler.js')}`
 
     if (!this.dest) {
-      this.dest = path.join(process.cwd(), `.clinic/${process.pid}-clinic.heapprofile`)
+      this.dest = path.join(process.cwd(), `.clinic/${process.pid}.clinic-heapprofile`)
     }
 
     const env = {
