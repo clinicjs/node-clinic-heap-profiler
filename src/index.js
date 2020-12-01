@@ -4,7 +4,7 @@ const { spawn } = require('child_process')
 const events = require('events')
 const fs = require('fs')
 const { ensureDir } = require('fs-extra')
-const { createServer } = require('net')
+const { createConnection, createServer } = require('net')
 const path = require('path')
 const pump = require('pump')
 const buildJs = require('@nearform/clinic-common/scripts/build-js')
@@ -12,8 +12,8 @@ const buildCss = require('@nearform/clinic-common/scripts/build-css')
 const mainTemplate = require('@nearform/clinic-common/templates/main')
 const analyse = require('./analysis/index.js')
 
-function execute(args, dest, env, nodeOptions, cb, server) {
-  ensureDir(path.dirname(dest), err => {
+function execute(instance, args, env, nodeOptions, cb) {
+  ensureDir(path.dirname(instance.dest), err => {
     if (err) {
       cb(err)
       return
@@ -22,22 +22,15 @@ function execute(args, dest, env, nodeOptions, cb, server) {
     env.NODE_OPTIONS = nodeOptions
     const app = spawn(args[0], args.slice(1), { stdio: ['ignore', 'inherit', 'inherit'], env })
 
-    // Forward SIGINT to the spawned process so it stops heap profiling
-    process.once('SIGINT', () => {
-      app.kill('SIGINT')
-    })
-
-    app.once('exit', code => {
-      if (server) {
-        server.close()
-      }
+    app.once('exit', (code, signal) => {
+      instance.emit('analysing')
 
       if (code) {
         cb(new Error(`Child process exited with code ${code}.`))
         return
       }
 
-      cb(null, dest)
+      cb(null, instance.dest)
     })
   })
 }
@@ -105,41 +98,55 @@ class ClinicHeapProfiler extends events.EventEmitter {
   }
 
   collect(args, cb) {
-    let nodeOptions = ` -r ${path.join(__dirname, './injects/sampler.js')}`
+    let nodeOptions = ` -r ${path.join(__dirname, './injects/ipc.js')}`
 
     if (!this.dest) {
-      this.dest = path.join(process.cwd(), `.clinic/${process.pid}.clinic-heapprofile`)
+      this.dest = `.clinic/${process.pid}.clinic-heapprofile`
     }
 
     const env = {
       ...process.env,
       HEAP_PROFILER_DESTINATION: this.dest,
-      HEAP_PROFILER_PRELOADER_DISABLED: 'true'
+      HEAP_PROFILER_PRELOADER_DISABLED: 'true',
+      HEAP_PROFILER_USE_IPC: this.detectPort.toString()
     }
 
-    if (this.detectPort) {
-      nodeOptions += ` -r ${path.join(__dirname, './injects/detect-port.js')}`
-
-      const server = createServer(socket => {
-        socket.once('data', port => {
-          socket.end()
-          server.close()
-          this.emit('port', Number(port.toString()))
-        })
-      }).on('error', err => {
-        return cb(err)
-      })
-
-      // Grab an arbitrary unused port
-      server.listen(0, () => {
-        env.CLINIC_HEAP_PROFILER_PORT = server.address().port.toString()
-        execute(args, this.dest, env, nodeOptions, cb, server)
-      })
-
+    if (!this.detectPort) {
+      execute(this, args, env, nodeOptions, cb)
       return
     }
 
-    execute(args, this.dest, env, nodeOptions, cb)
+    let applicationPort
+    const server = createServer(socket => {
+      socket.on('data', raw => {
+        const port = parseInt(raw.toString(), 0)
+
+        // That's the IPC port
+        if (port < 0) {
+          this.ipcPort = -port
+        } else {
+          applicationPort = port
+        }
+
+        if (this.detectPort && this.ipcPort && applicationPort) {
+          server.close()
+
+          /*
+            The last argument, by clinic CLI contract, is required when using --autocannon or --on-port option.
+            The CLI invokes the callback when the tool --autocannon or --on-port tool has finished.
+          */
+          this.emit('port', applicationPort, null, this.stopViaIPC.bind(this))
+        }
+      })
+    }).on('error', err => {
+      return cb(err)
+    })
+
+    // Grab an arbitrary unused port
+    server.listen(0, () => {
+      env.CLINIC_HEAP_PROFILER_PORT = server.address().port.toString()
+      execute(this, args, env, nodeOptions, cb)
+    })
   }
 
   visualize(sourceFile, outputFilename, cb) {
@@ -149,6 +156,16 @@ class ClinicHeapProfiler extends events.EventEmitter {
       }
 
       writeHtml(converted, outputFilename, this.debug, cb)
+    })
+  }
+
+  stopViaIPC() {
+    if (!this.ipcPort) {
+      return
+    }
+
+    const client = createConnection({ port: this.ipcPort }, () => {
+      client.end('clinic-heap-profiler:stop')
     })
   }
 }

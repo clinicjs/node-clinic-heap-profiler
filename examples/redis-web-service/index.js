@@ -62,7 +62,7 @@ heapProfiler.on('port', port => {
       }
 
       console.log('\nAutocannon has finished. Stopping the heap profiler.')
-      process.kill(process.pid, 'SIGINT')
+      heapProfiler.stopViaIPC()
     }
   )
 
