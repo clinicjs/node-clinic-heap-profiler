@@ -90,9 +90,9 @@ class ClinicHeapProfiler extends events.EventEmitter {
   constructor(settings = {}) {
     super()
 
-    const { detectPort = false, debug = false, dest = null } = settings
+    const { detectPort = false, debug = false, dest = `.clinic/${process.pid}.clinic-heapprofile` } = settings
 
-    this.detectPort = detectPort
+    this.detectPort = !!detectPort
     this.debug = debug
     this.dest = dest
   }
@@ -100,15 +100,11 @@ class ClinicHeapProfiler extends events.EventEmitter {
   collect(args, cb) {
     let nodeOptions = ` -r ${path.join(__dirname, './injects/ipc.js')}`
 
-    if (!this.dest) {
-      this.dest = `.clinic/${process.pid}.clinic-heapprofile`
-    }
-
     const env = {
       ...process.env,
       HEAP_PROFILER_DESTINATION: this.dest,
       HEAP_PROFILER_PRELOADER_DISABLED: 'true',
-      HEAP_PROFILER_USE_IPC: this.detectPort.toString()
+      HEAP_PROFILER_USE_IPC: this.detectPort
     }
 
     if (!this.detectPort) {
@@ -120,6 +116,10 @@ class ClinicHeapProfiler extends events.EventEmitter {
     const server = createServer(socket => {
       socket.on('data', raw => {
         const port = parseInt(raw.toString(), 0)
+
+        if (isNaN(port)) {
+          return
+        }
 
         // That's the IPC port
         if (port < 0) {
@@ -144,7 +144,7 @@ class ClinicHeapProfiler extends events.EventEmitter {
 
     // Grab an arbitrary unused port
     server.listen(0, () => {
-      env.CLINIC_HEAP_PROFILER_PORT = server.address().port.toString()
+      env.CLINIC_HEAP_PROFILER_PORT = server.address().port
       execute(this, args, env, nodeOptions, cb)
     })
   }

@@ -54,12 +54,12 @@ The sampling is stopped and data collected right before the process exits.
 
 If you want to collect data earlier, you can send the process a `SIGINT` or, if `detectPort` is `true`, you can call `heapProfiler.stopViaIPC()`.
 
-#### `flame.visualize(dataFilename, outputFilename, callback)`
+#### `heapProfiler.visualize(dataFilename, outputFilename, callback)`
 
 Will consume the datafile specified by `dataFilename`, this datafile will be
 produced by the sampler using `heapProfiler.collect`.
 
-`flame.visualize` will then output a standalone HTML file to `outputFilename`.
+`heapProfiler.visualize` will then output a standalone HTML file to `outputFilename`.
 When completed the `callback` will be called with no extra arguments, except a
 possible error.
 

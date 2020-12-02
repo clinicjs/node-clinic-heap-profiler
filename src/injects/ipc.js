@@ -44,9 +44,9 @@ function startIPC() {
 
   const listener = onNetListen(function ({ port }) {
     const client = createConnection({ port: clinicPort }, () => {
-      if (port === ipcPort) {
+      if (port === serverPort) {
         // Send the IPC port as negative, for the other side to make the distinction
-        client.end(`${-ipcPort}`)
+        client.end(`${-serverPort}`)
       } else {
         // Send the application port as positive
         client.end(`${port}`)
