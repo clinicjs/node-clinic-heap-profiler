@@ -164,9 +164,13 @@ class ClinicHeapProfiler extends events.EventEmitter {
       return
     }
 
-    const client = createConnection({ port: this.ipcPort }, () => {
-      client.end('clinic-heap-profiler:stop')
-    })
+    try {
+      const client = createConnection({ port: this.ipcPort }, () => {
+        client.end('clinic-heap-profiler:stop')
+      })
+    } catch (e) {
+      // Ignore if nobody is listening
+    }
   }
 }
 

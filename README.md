@@ -39,21 +39,20 @@ const heapProfiler = new ClinicHeapProfiler()
   - detectPort [`<boolean>`][] **Default**: false
   - debug [`<boolean>`][] If set to true, the generated html will not be minified.
     **Default**: false
-  - dest [`<String>`][] The file where the collected data is stored. By default it generates a `.clinic-heapprofile` file in the `.clinic` folder.
-    **Default**: '.'
+  - dest [`<String>`][] The file where the collected data is stored.
+    **Default**: `./.clinic/<process.pid>.clinic-heapprofile`
 
 #### `heapProfiler.collect(args, callback)`
 
 Starts a process by using [@nearform/heap-profiler](https://github.com/nearform/heap-profiler).
 
-heapProfiler will produce a file in the current working directory, with the process PID in
-its filename. The filepath relative to the current working directory will be the
-value in the callback.
+The process sampling is started as soon as the process starts. The filepath with collected data will be the value in the callback.
 
-`stdout`, `stderr`, and `stdin` will be relayed to the calling process. As will
-the `SIGINT` event.
+`stdout`, `stderr`, and `stdin` will be relayed to the calling process.
 
-In order to finish the sampling, the process must receive a `SIGINT` (the simplest way is to press Ctrl+C).
+The sampling is stopped and data collected right before the process exits.
+
+If you want to collect data earlier, you can send the process a `SIGINT` or, if `detectPort` is `true`, you can call `heapProfiler.stopViaIPC()`.
 
 #### `flame.visualize(dataFilename, outputFilename, callback)`
 

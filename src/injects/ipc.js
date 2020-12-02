@@ -14,7 +14,7 @@ let server
 let serverPort
 let stopped = false
 
-function stopSampling(why) {
+function stopSampling() {
   if (stopped) {
     return
   }
@@ -44,11 +44,14 @@ function startIPC() {
 
   const listener = onNetListen(function ({ port }) {
     const client = createConnection({ port: clinicPort }, () => {
-      /*
-        By convention, the IPC port is sent as negative, while the application one as positive
-        This is a quick way to establish a transmission protocol
-      */
-      client.end(((port === serverPort ? -1 : 1) * port).toString())
+      if (port === ipcPort) {
+        // Send the IPC port as negative, for the other side to make the distinction
+        client.end(`${-ipcPort}`)
+      } else {
+        // Send the application port as positive
+        client.end(`${port}`)
+      }
+
       toSend--
 
       // No more ports to send, remove the on-net-listen handler
@@ -64,10 +67,11 @@ function startIPC() {
   })
 }
 
-// Stop sampling on SIGINT
-process.once('SIGINT', stopSampling)
+/* 
+  If the process runs of out work before receiving a request to stop sampling, stop it manually
+  This also handles SIGINT based stopping requests
+*/
 
-// If the process runs of out work before receiving a request to stop sampling, stop it manually
 process.once('beforeExit', stopSampling)
 
 // Start sampling the process
