@@ -12,6 +12,8 @@ const buildCss = require('@nearform/clinic-common/scripts/build-css')
 const mainTemplate = require('@nearform/clinic-common/templates/main')
 const analyse = require('./analysis/index.js')
 
+const noop = function () {}
+
 function execute(instance, args, env, nodeOptions, cb) {
   ensureDir(path.dirname(instance.dest), err => {
     if (err) {
@@ -20,9 +22,19 @@ function execute(instance, args, env, nodeOptions, cb) {
     }
 
     env.NODE_OPTIONS = nodeOptions
-    const app = spawn(args[0], args.slice(1), { stdio: ['ignore', 'inherit', 'inherit'], env })
 
-    app.once('exit', (code, signal) => {
+    /* 
+      By default spawn creates a process in the same process group of the current one.
+      This means that SIGINT are received both from the parent and child processes.
+      We handle SIGINT in the child, so we want to ignore in the parent.
+    */
+    process.once('SIGINT', noop)
+
+    instance.process = spawn(args[0], args.slice(1), { stdio: ['ignore', 'inherit', 'inherit'], env })
+
+    instance.process.once('exit', (code, signal) => {
+      process.removeListener('SIGINT', noop)
+
       instance.emit('analysing')
 
       if (code) {
@@ -164,13 +176,12 @@ class ClinicHeapProfiler extends events.EventEmitter {
       return
     }
 
-    try {
-      const client = createConnection({ port: this.ipcPort }, () => {
-        client.end('clinic-heap-profiler:stop')
-      })
-    } catch (e) {
-      // Ignore if nobody is listening
-    }
+    const client = createConnection({ port: this.ipcPort }, () => {
+      client.end('clinic-heap-profiler:stop')
+    })
+
+    // Ignore if nobody is listening
+    client.on('error', noop)
   }
 }
 

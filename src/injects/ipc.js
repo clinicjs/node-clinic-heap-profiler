@@ -67,11 +67,9 @@ function startIPC() {
   })
 }
 
-/* 
-  If the process runs of out work before receiving a request to stop sampling, stop it manually
-  This also handles SIGINT based stopping requests
-*/
+process.once('SIGINT', stopSampling)
 
+//  If the process runs of out work before receiving a request to stop sampling, stop it manually
 process.once('beforeExit', stopSampling)
 
 // Start sampling the process
