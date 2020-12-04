@@ -1,26 +1,26 @@
-# Clinic.js Flame
+# Clinic.js Heap Profilder
 
 [![npm version][npm-version]][npm-url] [![Stability Stable][stability-stable]][stability-docs] [![Github Actions build status][actions-status]][actions-url]
 [![Downloads][npm-downloads]][npm-url] [![Code style][lint-standard]][lint-standard-url]
 
-Programmable interface to [Clinic.js][clinic-url] Flame. Learn more about Clinic.js: https://clinicjs.org/
+Programmable interface to [Clinic.js][clinic-url] Heap Profiler. Learn more about Clinic.js: https://clinicjs.org/
 
 ![Screenshot](screenshot.png)
 
 ## Supported node versions
 
-* Node.js 8 and above
+- Node.js 10 and above
 
 ## Example
 
 ```js
-const ClinicFlame = require('@nearform/flame')
-const flame = new ClinicFlame()
+const ClinicHeapProfiler = require('@nearform/clinic-heap-profiler')
+const heapProfiler = new ClinicHeapProfiler()
 
-flame.collect(['node', './path-to-script.js'], function (err, filepath) {
+heapProfiler.collect(['node', './path-to-script.js'], function (err, filepath) {
   if (err) throw err
 
-  flame.visualize(filepath, filepath + '.html', function (err) {
+  heapProfiler.visualize(filepath, filepath + '.html', function (err) {
     if (err) throw err
   })
 })
@@ -29,52 +29,73 @@ flame.collect(['node', './path-to-script.js'], function (err, filepath) {
 ## Documentation
 
 ```js
-const ClinicFlame = require('@nearform/flame')
-const flame = new ClinicFlame()
+const ClinicHeapProfiler = require('@nearform/clinic-heap-profiler')
+const heapProfiler = new ClinicHeapProfiler()
 ```
 
-### new ClinicFlame([settings])
+### new ClinicHeapProfiler([settings])
 
-* settings [`<Object>`][]
-  * detectPort [`<boolean>`][] **Default**: false
-  * debug [`<boolean>`][] If set to true, the generated html will not be minified.
+- settings [`<Object>`][]
+  - detectPort [`<boolean>`][] **Default**: false
+  - debug [`<boolean>`][] If set to true, the generated html will not be minified.
     **Default**: false
-  * dest [`<String>`][] The folder where the collected data is stored.
-    **Default**: '.'
+  - dest [`<String>`][] The file where the collected data is stored.
+    **Default**: `./.clinic/<process.pid>.clinic-heapprofile`
 
-#### `flame.collect(args, callback)`
+#### `heapProfiler.collect(args, callback)`
 
-Starts a process by using [0x](https://github.com/davidmarkclements/0x)
+Starts a process by using [@nearform/heap-profiler](https://github.com/nearform/heap-profiler).
 
-0x will produce a file in the current working directory, with the process PID in
-its filename. The filepath relative to the current working directory will be the
-value in the callback.
+The process sampling is started as soon as the process starts. The filepath with collected data will be the value in the callback.
 
-`stdout`, `stderr`, and `stdin` will be relayed to the calling process. As will
-the `SIGINT` event.
+`stdout`, `stderr`, and `stdin` will be relayed to the calling process.
 
-#### `flame.visualize(dataFilename, outputFilename, callback)`
+The sampling is stopped and data collected right before the process exits.
+
+If you want to collect data earlier, you can send the process a `SIGINT` or, if `detectPort` is `true`, you can call `heapProfiler.stopViaIPC()`.
+
+#### `heapProfiler.visualize(dataFilename, outputFilename, callback)`
 
 Will consume the datafile specified by `dataFilename`, this datafile will be
-produced by the sampler using `flame.collect`.
+produced by the sampler using `heapProfiler.collect`.
 
-`flame.visualize` will then output a standalone HTML file to `outputFilename`.
+`heapProfiler.visualize` will then output a standalone HTML file to `outputFilename`.
 When completed the `callback` will be called with no extra arguments, except a
 possible error.
 
+#### `heapProfiler.stopViaIPC()`
+
+When the profiler is started with `detectPort=true`, the profiler establish a TCP based IPC communication.
+
+This method can therefore be called to collect the data at any time.
+
+If no TCP channel is opened or available, the method will perform no operation so it is safe to call at all times.
+
+## Examples
+
+See the `examples` folder. All example should be run from the repository main folder:
+
+```sh
+node examples/redis-web-service
+```
+
+Each `index.js` will contain any specific setup step required by the example, if any.
+
 ## License
+
 [MIT](LICENSE)
 
 [stability-stable]: https://img.shields.io/badge/stability-stable-green.svg?style=flat-square
 [stability-docs]: https://nodejs.org/api/documentation.html#documentation_stability_index
-[npm-version]: https://img.shields.io/npm/v/@nearform/flame.svg?style=flat-square
-[npm-url]: https://www.npmjs.org/@nearform/flame
-[npm-downloads]: http://img.shields.io/npm/dm/@nearform/flame.svg?style=flat-square
+[npm-version]: https://img.shields.io/npm/v/@nearform/clinic-heap-profiler.svg?style=flat-square
+[npm-url]: https://www.npmjs.org/@nearform/clinic-heap-profiler
+[npm-downloads]: http://img.shields.io/npm/dm/@nearform/clinic-heap-profiler.svg?style=flat-square
 [lint-standard]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
 [lint-standard-url]: https://github.com/feross/standard
 [clinic-url]: https://github.com/nearform/node-clinic
-[`<Object>`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object
+[`<object>`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object
+[`<number>`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Number
 [`<boolean>`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type
-[`<String>`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String
+[`<string>`]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String
 [actions-status]: https://github.com/nearform/node-clinic-flame/workflows/CI/badge.svg
 [actions-url]: https://github.com/nearform/node-clinic-flame/actions
