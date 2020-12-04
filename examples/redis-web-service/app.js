@@ -4,7 +4,7 @@ const { spawnSync } = require('child_process')
 const fastify = require('fastify')
 const Redis = require('ioredis')
 
-function randomString(length = 0) {
+function randomString (length = 0) {
   if (length < 1) {
     length = Math.floor(Math.random() * 1000)
   }

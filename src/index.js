@@ -10,12 +10,14 @@ const pump = require('pump')
 const buildJs = require('@nearform/clinic-common/scripts/build-js')
 const buildCss = require('@nearform/clinic-common/scripts/build-css')
 const mainTemplate = require('@nearform/clinic-common/templates/main')
-const analyse = require('./analysis/index.js')
+const { analyse } = require('./analysis/index.js')
 
+/* istanbul ignore next */
 const noop = function () {}
 
-function execute(instance, args, env, nodeOptions, cb) {
+function execute (instance, args, env, nodeOptions, cb) {
   ensureDir(path.dirname(instance.dest), err => {
+    /* istanbul ignore if */
     if (err) {
       cb(err)
       return
@@ -23,7 +25,7 @@ function execute(instance, args, env, nodeOptions, cb) {
 
     env.NODE_OPTIONS = nodeOptions
 
-    /* 
+    /*
       By default spawn creates a process in the same process group of the current one.
       This means that SIGINT are received both from the parent and child processes.
       We handle SIGINT in the child, so we want to ignore in the parent.
@@ -37,7 +39,7 @@ function execute(instance, args, env, nodeOptions, cb) {
 
       instance.emit('analysing')
 
-      if (code) {
+      if (code && !instance.collectOnFailure) {
         cb(new Error(`Child process exited with code ${code}.`))
         return
       }
@@ -47,7 +49,7 @@ function execute(instance, args, env, nodeOptions, cb) {
   })
 }
 
-function writeHtml(data, outputFilename, debug, cb) {
+function writeHtml (data, outputFilename, debug, cb) {
   const fakeDataPath = path.join(__dirname, 'visualizer', 'data.json')
   const stylePath = path.join(__dirname, 'visualizer', 'style.css')
   const scriptPath = path.join(__dirname, 'visualizer', 'main.js')
@@ -68,7 +70,7 @@ function writeHtml(data, outputFilename, debug, cb) {
     debug,
     fakeDataPath,
     scriptPath,
-    beforeBundle(b) {
+    beforeBundle (b) {
       b.require({ source: JSON.stringify(data), file: fakeDataPath })
     },
     env: {
@@ -99,18 +101,24 @@ function writeHtml(data, outputFilename, debug, cb) {
 }
 
 class ClinicHeapProfiler extends events.EventEmitter {
-  constructor(settings = {}) {
+  constructor (settings = {}) {
     super()
 
-    const { detectPort = false, debug = false, dest = `.clinic/${process.pid}.clinic-heapprofile` } = settings
+    const {
+      detectPort = false,
+      collectOnFailure = false,
+      debug = false,
+      dest = `.clinic/${process.pid}.clinic-heapprofile`
+    } = settings
 
     this.detectPort = !!detectPort
+    this.collectOnFailure = !!collectOnFailure
     this.debug = debug
     this.dest = dest
   }
 
-  collect(args, cb) {
-    let nodeOptions = ` -r ${path.join(__dirname, './injects/ipc.js')}`
+  collect (args, cb) {
+    const nodeOptions = ` -r ${path.join(__dirname, './injects/ipc.js')}`
 
     const env = {
       ...process.env,
@@ -129,6 +137,7 @@ class ClinicHeapProfiler extends events.EventEmitter {
       socket.on('data', raw => {
         const port = parseInt(raw.toString(), 0)
 
+        /* istanbul ignore if */
         if (isNaN(port)) {
           return
         }
@@ -150,9 +159,13 @@ class ClinicHeapProfiler extends events.EventEmitter {
           this.emit('port', applicationPort, null, this.stopViaIPC.bind(this))
         }
       })
-    }).on('error', err => {
-      return cb(err)
-    })
+    }).on(
+      'error',
+      /* istanbul ignore next */
+      err => {
+        return cb(err)
+      }
+    )
 
     // Grab an arbitrary unused port
     server.listen(0, () => {
@@ -161,7 +174,7 @@ class ClinicHeapProfiler extends events.EventEmitter {
     })
   }
 
-  visualize(sourceFile, outputFilename, cb) {
+  visualize (sourceFile, outputFilename, cb) {
     analyse(sourceFile, (err, converted) => {
       if (err) {
         return cb(err)
@@ -171,7 +184,7 @@ class ClinicHeapProfiler extends events.EventEmitter {
     })
   }
 
-  stopViaIPC() {
+  stopViaIPC () {
     if (!this.ipcPort) {
       return
     }
