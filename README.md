@@ -63,6 +63,14 @@ produced by the sampler using `heapProfiler.collect`.
 When completed the `callback` will be called with no extra arguments, except a
 possible error.
 
+#### `heapProfiler.stopViaIPC()`
+
+When the profiler is started with `detectPort=true`, the profiler establish a TCP based IPC communication.
+
+This method can therefore be called to collect the data at any time.
+
+If no TCP channel is opened or available, the method will perform no operation so it is safe to call at all times.
+
 ## Examples
 
 See the `examples` folder. All example should be run from the repository main folder:
