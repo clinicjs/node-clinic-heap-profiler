@@ -1,4 +1,4 @@
-# Clinic.js Heap Profilder
+# Clinic.js Heap Profiler
 
 [![npm version][npm-version]][npm-url] [![Stability Stable][stability-stable]][stability-docs] [![Github Actions build status][actions-status]][actions-url]
 [![Downloads][npm-downloads]][npm-url] [![Code style][lint-standard]][lint-standard-url]
