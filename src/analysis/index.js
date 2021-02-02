@@ -2,13 +2,15 @@
 
 const fs = require('fs')
 const path = require('path')
+/* istanbul ignore next */
+const platform = path.sep === '\\' ? path.win32 : path.posix
 
-function isNodeCore(url) {
+function isNodeCore (url) {
   const filePath = url.split(' ')[1]
-  return (path.sep === '\\' ? path.win32 : path.posix).isAbsolute(filePath) === false
+  return platform.isAbsolute(filePath) === false
 }
 
-function categoriseV8(name, url) {
+function categoriseV8 (name, url) {
   const core = { type: 'core', category: 'core' }
   let type = ''
 
@@ -26,14 +28,14 @@ function categoriseV8(name, url) {
     }
   } else if (/ native /.test(name)) {
     type = 'native'
-  } else if (isNodeCore(name, url)) {
+  } else if (isNodeCore(name)) {
     return core
   }
 
   return type ? { type, category: 'all-v8' } : null
 }
 
-function categoriseDep(name) {
+function categoriseDep (name) {
   const escSep = path.sep
   const nodeModules = `${escSep}node_modules${escSep}`
   const depDirRegex = new RegExp(`${nodeModules}(?:(@.+?)${escSep})?(.+?)${escSep}(?!.*${nodeModules})`)
@@ -42,7 +44,7 @@ function categoriseDep(name) {
   return match ? { type: match[1] ? match.slice(1, 3).join('/') : match[2], category: 'deps' } : null
 }
 
-function categorise(name, url, appName) {
+function categorise (name, url, appName) {
   // Check for WASM or Regexp
   if (/\[WASM:\w+]$/.test(name)) {
     return { type: 'wasm', category: 'wasm' }
@@ -53,7 +55,7 @@ function categorise(name, url, appName) {
   return categoriseV8(name, url) || categoriseDep(name) || { type: appName, category: 'app' }
 }
 
-function translateChildren(deps, node, samples, appName, root = false) {
+function translateChildren (deps, node, samples, appName, root = false) {
   const children = []
   let { functionName, url, lineNumber, columnNumber } = node.callFrame
 
@@ -81,6 +83,7 @@ function translateChildren(deps, node, samples, appName, root = false) {
   const name = `${functionName} ${url}${location}`.trim()
   const { category, type } = root ? { type: appName, category: 'app' } : categorise(name, url, appName)
 
+  /* istanbul ignore if */
   if (type === 'regexp') {
     functionName = `/${name.replace(/ \[CODE:RegExp\].*$/, '')}/`
     url = '[CODE:RegExp]'
@@ -108,7 +111,7 @@ function translateChildren(deps, node, samples, appName, root = false) {
   }
 }
 
-function analyse(input, cb) {
+function analyse (input, cb) {
   fs.readFile(input, 'utf8', (err, raw) => {
     if (err) {
       return cb(err)
@@ -182,9 +185,10 @@ function analyse(input, cb) {
         data: tree
       })
     } catch (e) {
+      /* istanbul ignore next */
       cb(e)
     }
   })
 }
 
-module.exports = analyse
+module.exports = { categorise, analyse }

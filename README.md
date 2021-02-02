@@ -37,6 +37,8 @@ const heapProfiler = new ClinicHeapProfiler()
 
 - settings [`<Object>`][]
   - detectPort [`<boolean>`][] **Default**: false
+  - collectOnFailure [`<boolean>`][] If set to true, the collected data will be returned even if the process exits with non-zero code.
+    **Default**: false
   - debug [`<boolean>`][] If set to true, the generated html will not be minified.
     **Default**: false
   - dest [`<String>`][] The file where the collected data is stored.

@@ -14,7 +14,7 @@ let server
 let serverPort
 let stopped = false
 
-function stopSampling() {
+function stopSampling () {
   if (stopped) {
     return
   }
@@ -27,7 +27,7 @@ function stopSampling() {
   }
 }
 
-function startIPC() {
+function startIPC () {
   // Create a TCP server which will eventually receive termination notice from a calling process
   server = createServer(socket => {
     socket.on('data', data => {

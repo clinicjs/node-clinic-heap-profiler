@@ -1,12 +1,12 @@
 'use strict'
 
-/* 
+/*
   How to run this example:
 
-  - Start a Redis server on the local machine. 
-  
+  - Start a Redis server on the local machine.
+
     If you are using Docker, you can just do: sudo docker run -p 6379:6379 redis
-    
+
     If you don't want to start a Redis server locally, provide a remote Redis server URL via REDIS_URL env variable,
     for information about the URL format, see: https://github.com/luin/ioredis#connect-to-redis
 
@@ -16,7 +16,6 @@
 */
 
 const autocannon = require('autocannon')
-const { spawnSync } = require('child_process')
 const open = require('open')
 const { join } = require('path')
 const ClinicHeapProfiler = require('../../')
