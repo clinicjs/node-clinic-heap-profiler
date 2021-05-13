@@ -1,8 +1,8 @@
 {
-  "name": "@nearform/heap-profiler",
-  "version": "1.0.0",
+  "name": "@nearform/clinic-heap-profiler",
+  "version": "2.0.0",
   "engines": {
-    "node": ">= 10.12.0"
+    "node": ">= 12.13.0"
   },
   "description": "Programmable interface to Clinic.js Heap Profiler",
   "repository": "https://github.com/clinicjs/node-clinic-heap-profiler",
@@ -28,8 +28,8 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@nearform/clinic-common": "^4.0.0",
-    "@nearform/heap-profiler": "^0.8.1",
+    "@nearform/clinic-common": "^6.0.0",
+    "@nearform/heap-profiler": "^2.0.0",
     "abort-controller": "^3.0.0",
     "copy-to-clipboard": "^3.0.8",
     "d3-array": "^2.0.2",
