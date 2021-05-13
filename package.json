@@ -1,11 +1,11 @@
 {
-  "name": "clinic-heap-profiler",
+  "name": "@nearform/heap-profiler",
   "version": "1.0.0",
   "engines": {
     "node": ">= 10.12.0"
   },
   "description": "Programmable interface to Clinic.js Heap Profiler",
-  "repository": "nearform/node-clinic-heap-profiler",
+  "repository": "https://github.com/clinicjs/node-clinic-heap-profiler",
   "main": "src/index.js",
   "scripts": {
     "visualize-watch": "node debug/visualize-watch.js",
