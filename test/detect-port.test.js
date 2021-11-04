@@ -13,14 +13,14 @@ test('cmd - collect - detect server port', t => {
     let count = 0
 
     function callback (err) {
-      t.ifError(err)
+      t.error(err)
 
       if (++count === 2) {
         t.end()
       }
     }
 
-    t.ifError(err)
+    t.error(err)
 
     t.match(filename, /[0-9]+\.clinic-heapprofile$/)
 
@@ -61,7 +61,7 @@ test('cmd - collect - detect server port', t => {
 
       res.on('data', data => buf.push(data))
       res.on('end', () => {
-        t.deepEquals(Buffer.concat(buf), Buffer.from('from server'))
+        t.same(Buffer.concat(buf), Buffer.from('from server'))
 
         tool.stopViaIPC()
       })

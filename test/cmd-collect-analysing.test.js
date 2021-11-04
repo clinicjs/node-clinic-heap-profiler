@@ -9,12 +9,12 @@ test('test collect - emits "analysing" event', t => {
   const tool = new ClinicHeapProfiler()
 
   function cleanup (err, filename) {
-    t.ifError(err)
+    t.error(err)
 
     t.match(filename, /[0-9]+\.clinic-heapprofile$/)
 
     fs.unlink(filename, err => {
-      t.ifError(err)
+      t.error(err)
       t.end()
     })
   }

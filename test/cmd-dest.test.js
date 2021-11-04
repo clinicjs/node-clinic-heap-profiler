@@ -12,14 +12,14 @@ test('cmd - test collect - custom output destination', t => {
     let count = 0
 
     function callback (err) {
-      t.ifError(err)
+      t.error(err)
 
       if (++count === 2) {
         t.end()
       }
     }
 
-    t.ifError(err)
+    t.error(err)
 
     t.match(filename, /^test-output-destination$/)
 
