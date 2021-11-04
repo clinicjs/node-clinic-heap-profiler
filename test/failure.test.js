@@ -18,12 +18,12 @@ test('cmd - test collect - works with nonzero exit code when collectOnFailure=tr
   const tool = new ClinicHeapProfiler({ collectOnFailure: true })
 
   function cleanup (err, filename) {
-    t.ifError(err)
+    t.error(err)
 
     t.match(filename, /[0-9]+\.clinic-heapprofile$/)
 
     fs.unlink(filename, err => {
-      t.ifError(err)
+      t.error(err)
       t.end()
     })
   }
