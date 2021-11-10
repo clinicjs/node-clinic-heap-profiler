@@ -1,5 +1,5 @@
 {
-  "name": "node-clinic-heap-profiler",
+  "name": "@nearform/clinic-heap-profiler",
   "version": "1.1.0",
   "engines": {
     "node": ">= 12.13.0"
