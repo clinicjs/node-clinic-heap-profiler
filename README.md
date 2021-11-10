@@ -5,7 +5,11 @@
 
 Programmable interface to [Clinic.js][clinic-url] Heap Profiler. Learn more about Clinic.js: https://clinicjs.org/
 
-![Screenshot](screenshot.png)
+## Installation
+
+```console
+npm i -S @nearform/clinic-heap-profiler
+```
 
 ## Supported node versions
 
