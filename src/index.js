@@ -7,9 +7,9 @@ const { ensureDir } = require('fs-extra')
 const { createConnection, createServer } = require('net')
 const path = require('path')
 const pump = require('pump')
-const buildJs = require('@nearform/clinic-common/scripts/build-js')
-const buildCss = require('@nearform/clinic-common/scripts/build-css')
-const mainTemplate = require('@nearform/clinic-common/templates/main')
+const buildJs = require('@clinic/clinic-common/scripts/build-js')
+const buildCss = require('@clinic/clinic-common/scripts/build-css')
+const mainTemplate = require('@clinic/clinic-common/templates/main')
 const { analyse } = require('./analysis/index.js')
 
 /* istanbul ignore next */

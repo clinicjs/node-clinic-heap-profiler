@@ -8,7 +8,7 @@ Programmable interface to [Clinic.js][clinic-url] Heap Profiler. Learn more abou
 ## Installation
 
 ```console
-npm i -S @nearform/clinic-heap-profiler
+npm i -S @clinic/heap-profiler
 ```
 
 ## Supported node versions
@@ -18,7 +18,7 @@ npm i -S @nearform/clinic-heap-profiler
 ## Example
 
 ```js
-const ClinicHeapProfiler = require('@nearform/clinic-heap-profiler')
+const ClinicHeapProfiler = require('@clinic/heap-profiler')
 const heapProfiler = new ClinicHeapProfiler()
 
 heapProfiler.collect(['node', './path-to-script.js'], function (err, filepath) {
@@ -33,7 +33,7 @@ heapProfiler.collect(['node', './path-to-script.js'], function (err, filepath) {
 ## Documentation
 
 ```js
-const ClinicHeapProfiler = require('@nearform/clinic-heap-profiler')
+const ClinicHeapProfiler = require('@clinic/heap-profiler')
 const heapProfiler = new ClinicHeapProfiler()
 ```
 
@@ -93,9 +93,9 @@ Each `index.js` will contain any specific setup step required by the example, if
 
 [stability-stable]: https://img.shields.io/badge/stability-stable-green.svg?style=flat-square
 [stability-docs]: https://nodejs.org/api/documentation.html#documentation_stability_index
-[npm-version]: https://img.shields.io/npm/v/@nearform/clinic-heap-profiler.svg?style=flat-square
-[npm-url]: https://www.npmjs.org/@nearform/clinic-heap-profiler
-[npm-downloads]: http://img.shields.io/npm/dm/@nearform/clinic-heap-profiler.svg?style=flat-square
+[npm-version]: https://img.shields.io/npm/v/@clinic/heap-profiler.svg?style=flat-square
+[npm-url]: https://www.npmjs.org/@clinic/heap-profiler
+[npm-downloads]: http://img.shields.io/npm/dm/@clinic/heap-profiler.svg?style=flat-square
 [lint-standard]: https://img.shields.io/badge/code%20style-standard-brightgreen.svg?style=flat-square
 [lint-standard-url]: https://github.com/feross/standard
 [clinic-url]: https://github.com/clinicjs/node-clinic
