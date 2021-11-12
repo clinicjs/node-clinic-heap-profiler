@@ -1,6 +1,6 @@
 {
-  "name": "@nearform/clinic-heap-profiler",
-  "version": "1.1.0",
+  "name": "@clinic/heap-profiler",
+  "version": "3.0.0",
   "engines": {
     "node": ">= 12.13.0"
   },
@@ -28,7 +28,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "@nearform/clinic-common": "^6.0.0",
+    "@clinic/clinic-common": "^7.0.0",
     "@nearform/heap-profiler": "^2.0.0",
     "abort-controller": "^3.0.0",
     "copy-to-clipboard": "^3.0.8",
