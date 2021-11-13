@@ -18,6 +18,7 @@ test('analysis - test categorise', t => {
   t.same(categorise('index.mjs native other'), { type: 'native', category: 'all-v8' })
 
   t.same(categorise(' index.mjs'), { type: 'core', category: 'core' })
+  t.same(categorise('clearBuffer node:internal/streams/writable:529:21'), { type: 'core', category: 'core' })
 
   t.end()
 })
