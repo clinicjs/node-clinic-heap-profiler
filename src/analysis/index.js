@@ -14,7 +14,7 @@ function categoriseV8 (name, url) {
   const core = { type: 'core', category: 'core' }
   let type = ''
 
-  if (!/\.m?js/.test(name)) {
+  if (!/(\.m?js)|(node:)/.test(name)) {
     if (/\[CODE:.*?]$/.test(name) || /v8::internal::.*\[CPP]$/.test(name)) {
       type = 'v8'
     } else if (/\.$/.test(name)) {
