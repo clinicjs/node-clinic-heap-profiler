@@ -5,6 +5,8 @@
 
 Programmable interface to [Clinic.js][clinic-url] Heap Profiler. Learn more about Clinic.js: https://clinicjs.org/
 
+![screenshot](https://user-images.githubusercontent.com/26234614/143886238-481abe39-4cc7-470a-a1cd-144a73a070b9.png)
+
 ## Installation
 
 ```console
