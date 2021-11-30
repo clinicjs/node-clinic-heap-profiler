@@ -73,6 +73,11 @@ function translateChildren (deps, node, samples, appName, root = false) {
   }
 
   for (const c of node.children) {
+    /* istanbul ignore if */
+    if (
+      c.callFrame.url &&
+      c.callFrame.url.includes('node_modules/@clinic/heap-profiler')
+    ) continue
     children.push(translateChildren(deps, c, samples, appName))
   }
 
