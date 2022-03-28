@@ -47,7 +47,7 @@
     "chalk": "^4.1.0",
     "chokidar": "^3.4.2",
     "fastify": "^3.7.0",
-    "ioredis": "^4.17.3",
+    "ioredis": "^5.0.1",
     "open": "^8.4.0",
     "snazzy": "^8.0.0",
     "standard": "^16.0.4",
