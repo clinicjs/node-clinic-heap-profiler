@@ -30,7 +30,7 @@ const WalkthroughSteps = [
     msg: `
     <div>
       <h4>A hot function</h4>
-      <p>This is a "hot" function - a lot of memorty was allocated by this function. The brighter the colour on the exposed top of a block, the "hotter" it is compared to the rest of the profile.</p>
+      <p>This is a "hot" function - a lot of memory was allocated by this function. The brighter the colour on the exposed top of a block, the "hotter" it is compared to the rest of the profile.</p>
       <p>This might signify a problem: for example it might be a memory leak, or that is called very many times by functions below it.</p>
     </div>`
   },
@@ -84,7 +84,7 @@ const WalkthroughSteps = [
       <h4>Advanced options</h4>
       <p>Typing part of a function name, file path or equivalent into this search box highlights every matching block.</p>
       <p>Advanced options can also be accessed here.</p>
-      <p>For more infomation and detailed walkthroughs, see:</p> ${docs.outerHTML}
+      <p>For more information and detailed walkthroughs, see:</p> ${docs.outerHTML}
    </div>`
   }
 ]
