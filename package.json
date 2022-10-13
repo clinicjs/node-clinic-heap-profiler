@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "autocannon": "^7.5.0",
-    "chalk": "^4.1.0",
+    "chalk": "^5.1.2",
     "chokidar": "^3.4.2",
     "fastify": "^4.0.0",
     "ioredis": "^5.0.1",
