@@ -76,8 +76,8 @@ class DataTree {
       // Value of hidden frames is the sum of their visible children
       return node.children
         ? node.children.reduce((acc, child) => {
-            return acc + this.getNodeValue(child)
-          }, 0)
+          return acc + this.getNodeValue(child)
+        }, 0)
         : 0
     }
 
