@@ -11,7 +11,7 @@ test('test collect - emits "analysing" event', t => {
   function cleanup (err, filename) {
     t.error(err)
 
-    t.match(filename, /[0-9]+\.clinic-heapprofile$/)
+    t.match(filename, /[0-9]+\.clinic-heapprofiler$/)
 
     fs.unlink(filename, err => {
       t.error(err)

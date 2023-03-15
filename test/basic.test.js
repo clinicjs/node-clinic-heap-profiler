@@ -21,7 +21,7 @@ test('cmd - test collect - data exists, html generated', t => {
 
     t.error(err)
 
-    t.match(filename, /[0-9]+\.clinic-heapprofile$/)
+    t.match(filename, /[0-9]+\.clinic-heapprofiler$/)
 
     fs.unlink(filename, callback)
     fs.unlink(filename + '.html', callback)

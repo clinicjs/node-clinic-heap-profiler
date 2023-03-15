@@ -105,7 +105,8 @@ class ClinicHeapProfiler extends events.EventEmitter {
       detectPort = false,
       collectOnFailure = false,
       debug = false,
-      dest = `.clinic/${process.pid}.clinic-heapprofile`
+      name,
+      dest = `.clinic/${name || process.pid}.clinic-heapprofiler`
     } = settings
 
     this.detectPort = !!detectPort

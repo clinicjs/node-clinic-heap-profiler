@@ -20,7 +20,7 @@ test('cmd - test collect - works with nonzero exit code when collectOnFailure=tr
   function cleanup (err, filename) {
     t.error(err)
 
-    t.match(filename, /[0-9]+\.clinic-heapprofile$/)
+    t.match(filename, /[0-9]+\.clinic-heapprofiler$/)
 
     fs.unlink(filename, err => {
       t.error(err)
