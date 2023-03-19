@@ -7,6 +7,10 @@ Programmable interface to [Clinic.js][clinic-url] Heap Profiler. Learn more abou
 
 ![screenshot](https://user-images.githubusercontent.com/26234614/143886238-481abe39-4cc7-470a-a1cd-144a73a070b9.png)
 
+## Issues
+
+To open an issue, please use the [main repository](https://github.com/clinicjs/node-clinic) with the `heapprofiler` label.
+
 ## Installation
 
 ```console
