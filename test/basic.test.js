@@ -90,7 +90,7 @@ test('child_process - test spawn - filepath with spaces should be preloaded', t 
   )
 
   this.process.once('exit', (code) => {
-    t.notOk(code)
+    t.equal(code, 0)
     t.end()
   })
 })
