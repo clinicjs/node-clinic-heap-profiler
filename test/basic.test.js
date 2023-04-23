@@ -1,5 +1,6 @@
 'use strict'
 
+const { spawn } = require('child_process')
 const fs = require('fs')
 const path = require('path')
 const { test } = require('tap')
@@ -70,6 +71,27 @@ test('cmd - test collect - data exists, html generated', t => {
         })
       })
     })
+  })
+})
+
+test('child_process - test spawn - filepath with spaces should be preloaded', t => {
+  const env = process.env
+
+  // double quotes are required for paths with spaces
+  env.NODE_OPTIONS = `-r "${path.join(__dirname, 'fixtures', 'file with space.js')}"`
+  if (process.platform === 'win32') {
+    env.NODE_OPTIONS = env.NODE_OPTIONS.replace(/\\/g, '\\\\')
+  }
+
+  this.process = spawn(
+    process.execPath,
+    [path.join('test', 'fixtures', 'randomHashes.js')],
+    { stdio: ['ignore', 'inherit', 'inherit'], env }
+  )
+
+  this.process.once('exit', (code) => {
+    t.notOk(code)
+    t.end()
   })
 })
 
