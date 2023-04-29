@@ -116,7 +116,12 @@ class ClinicHeapProfiler extends events.EventEmitter {
   }
 
   collect (args, cb) {
-    const nodeOptions = ` -r ${path.join(__dirname, './injects/ipc.js')}`
+    let preloadPath = path.join(__dirname, './injects/ipc.js')
+    if (process.platform === 'win32') {
+      preloadPath = preloadPath.replace(/\\/g, '\\\\')
+    }
+
+    const nodeOptions = `-r "${preloadPath}"`
 
     const env = {
       ...process.env,
