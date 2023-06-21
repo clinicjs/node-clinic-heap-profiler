@@ -16,7 +16,7 @@ const { analyse } = require('./analysis/index.js')
 const noop = function () {}
 
 function execute (instance, args, env, nodeOptions, cb) {
-  ensureDir(path.dirname(instance.dest), err => {
+  ensureDir(instance.path, err => {
     /* istanbul ignore if */
     if (err) {
       cb(err)
@@ -44,7 +44,7 @@ function execute (instance, args, env, nodeOptions, cb) {
         return
       }
 
-      cb(null, instance.dest)
+      cb(null, `${instance.path}/${instance.name || instance.process.pid}.clinic-heapprofiler`)
     })
   })
 }
@@ -105,14 +105,15 @@ class ClinicHeapProfiler extends events.EventEmitter {
       detectPort = false,
       collectOnFailure = false,
       debug = false,
-      name,
-      dest = `.clinic/${name || process.pid}.clinic-heapprofiler`
+      dest = '.clinic',
+      name
     } = settings
 
     this.detectPort = !!detectPort
     this.collectOnFailure = !!collectOnFailure
     this.debug = debug
-    this.dest = dest
+    this.path = dest
+    this.name = name
   }
 
   collect (args, cb) {
@@ -125,7 +126,8 @@ class ClinicHeapProfiler extends events.EventEmitter {
 
     const env = {
       ...process.env,
-      HEAP_PROFILER_DESTINATION: this.dest,
+      HEAP_PROFILER_NAME: this.name,
+      HEAP_PROFILER_PATH: this.path,
       HEAP_PROFILER_PRELOADER_DISABLED: 'true',
       HEAP_PROFILER_USE_IPC: this.detectPort
     }

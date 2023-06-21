@@ -7,7 +7,10 @@ const onNetListen = require('on-net-listen')
 
 const controller = new AbortController()
 const clinicPort = parseInt(process.env.CLINIC_HEAP_PROFILER_PORT, 10)
-const profilerOptions = { destination: process.env.HEAP_PROFILER_DESTINATION, signal: controller.signal }
+const profilerOptions = {
+  destination: `${process.env.HEAP_PROFILER_PATH}/${process.env.HEAP_PROFILER_NAME || process.pid}.clinic-heapprofiler`,
+  signal: controller.signal
+}
 
 let toSend = 2 // We need to send two ports: the IPC one and the application one
 let server

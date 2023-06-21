@@ -51,8 +51,10 @@ const heapProfiler = new ClinicHeapProfiler()
     **Default**: false
   - debug [`<boolean>`][] If set to true, the generated html will not be minified.
     **Default**: false
-  - dest [`<String>`][] The file where the collected data is stored.
-    **Default**: `./.clinic/<process.pid>.clinic-heapprofile`
+  - dest [`<String>`][] Destination for the collected data
+    **Default**: `.clinic`
+  - name File name for the collected data
+    **Default**: `<process.pid>.clinic-heapprofiler`
 
 #### `heapProfiler.collect(args, callback)`
 
