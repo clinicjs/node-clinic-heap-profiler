@@ -53,7 +53,7 @@ const heapProfiler = new ClinicHeapProfiler()
     **Default**: false
   - dest [`<String>`][] Destination for the collected data
     **Default**: `.clinic`
-  - name File name for the collected data
+  - name [`<String>`][] File name for the collected data
     **Default**: `<process.pid>.clinic-heapprofiler`
 
 #### `heapProfiler.collect(args, callback)`
