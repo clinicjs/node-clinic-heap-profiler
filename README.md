@@ -19,7 +19,7 @@ npm i -S @clinic/heap-profiler
 
 ## Supported node versions
 
-- Node.js 14 and above
+- Node.js 16 and above
 
 ## Example
 
